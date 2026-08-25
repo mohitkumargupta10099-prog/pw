@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
 });
 
 function StudyPage() {
-  const [batchId, setBatchId] = useState(enrolledBatches[0].id);
+  const [batchId, setBatchId] = useState(enrolledBatches[0]!.id);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [slide, setSlide] = useState(0);
