@@ -13,7 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BatchesRouteImport } from './routes/batches'
 import { Route as MyBatchesRouteImport } from './routes/my-batches'
 import { Route as MyHistoryRouteImport } from './routes/my-history'
+import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as PiRouteImport } from './routes/pi'
 import { Route as SelectGoalRouteImport } from './routes/select-goal'
+import { Route as StoreRouteImport } from './routes/store'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,9 +38,24 @@ const MyHistoryRoute = MyHistoryRouteImport.update({
   path: '/my-history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PiRoute = PiRouteImport.update({
+  id: '/pi',
+  path: '/pi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SelectGoalRoute = SelectGoalRouteImport.update({
   id: '/select-goal',
   path: '/select-goal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StoreRoute = StoreRouteImport.update({
+  id: '/store',
+  path: '/store',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -46,14 +64,20 @@ export interface FileRoutesByFullPath {
   '/batches': typeof BatchesRoute
   '/my-batches': typeof MyBatchesRoute
   '/my-history': typeof MyHistoryRoute
+  '/offline': typeof OfflineRoute
+  '/pi': typeof PiRoute
   '/select-goal': typeof SelectGoalRoute
+  '/store': typeof StoreRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/batches': typeof BatchesRoute
   '/my-batches': typeof MyBatchesRoute
   '/my-history': typeof MyHistoryRoute
+  '/offline': typeof OfflineRoute
+  '/pi': typeof PiRoute
   '/select-goal': typeof SelectGoalRoute
+  '/store': typeof StoreRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,20 +85,42 @@ export interface FileRoutesById {
   '/batches': typeof BatchesRoute
   '/my-batches': typeof MyBatchesRoute
   '/my-history': typeof MyHistoryRoute
+  '/offline': typeof OfflineRoute
+  '/pi': typeof PiRoute
   '/select-goal': typeof SelectGoalRoute
+  '/store': typeof StoreRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/batches' | '/my-batches' | '/my-history' | '/select-goal'
+  fullPaths:
+    | '/'
+    | '/batches'
+    | '/my-batches'
+    | '/my-history'
+    | '/offline'
+    | '/pi'
+    | '/select-goal'
+    | '/store'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/batches' | '/my-batches' | '/my-history' | '/select-goal'
+  to:
+    | '/'
+    | '/batches'
+    | '/my-batches'
+    | '/my-history'
+    | '/offline'
+    | '/pi'
+    | '/select-goal'
+    | '/store'
   id:
     | '__root__'
     | '/'
     | '/batches'
     | '/my-batches'
     | '/my-history'
+    | '/offline'
+    | '/pi'
     | '/select-goal'
+    | '/store'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -82,7 +128,10 @@ export interface RootRouteChildren {
   BatchesRoute: typeof BatchesRoute
   MyBatchesRoute: typeof MyBatchesRoute
   MyHistoryRoute: typeof MyHistoryRoute
+  OfflineRoute: typeof OfflineRoute
+  PiRoute: typeof PiRoute
   SelectGoalRoute: typeof SelectGoalRoute
+  StoreRoute: typeof StoreRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,11 +164,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pi': {
+      id: '/pi'
+      path: '/pi'
+      fullPath: '/pi'
+      preLoaderRoute: typeof PiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/select-goal': {
       id: '/select-goal'
       path: '/select-goal'
       fullPath: '/select-goal'
       preLoaderRoute: typeof SelectGoalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/store': {
+      id: '/store'
+      path: '/store'
+      fullPath: '/store'
+      preLoaderRoute: typeof StoreRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -130,7 +200,10 @@ const rootRouteChildren: RootRouteChildren = {
   BatchesRoute: BatchesRoute,
   MyBatchesRoute: MyBatchesRoute,
   MyHistoryRoute: MyHistoryRoute,
+  OfflineRoute: OfflineRoute,
+  PiRoute: PiRoute,
   SelectGoalRoute: SelectGoalRoute,
+  StoreRoute: StoreRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
