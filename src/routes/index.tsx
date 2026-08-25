@@ -30,11 +30,10 @@ export const Route = createFileRoute("/")({
 });
 
 function StudyPage() {
-  const [batchId, setBatchId] = useState(enrolledBatches[0]!.id);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [batchId, setBatchId] = useState(enrolledBatches[0]?.id ?? "");
   const [moreOpen, setMoreOpen] = useState(false);
   const [slide, setSlide] = useState(0);
-  const batch = enrolledBatches.find((b) => b.id === batchId)!;
+
 
   return (
     <PageShell>
