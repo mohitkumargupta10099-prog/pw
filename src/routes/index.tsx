@@ -30,58 +30,78 @@ export const Route = createFileRoute("/")({
 });
 
 function StudyPage() {
-  const [batchId, setBatchId] = useState(enrolledBatches[0]!.id);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [batchId, setBatchId] = useState(enrolledBatches[0]?.id ?? "");
   const [moreOpen, setMoreOpen] = useState(false);
   const [slide, setSlide] = useState(0);
-  const batch = enrolledBatches.find((b) => b.id === batchId)!;
+
 
   return (
     <PageShell>
       <TopBar />
 
-      {/* Enrolled batch selector */}
-      <section className="bg-card">
-        <button
-          onClick={() => setPickerOpen((v) => !v)}
-          className="flex w-full items-center gap-2 px-4 py-4"
-        >
-          <span className="text-xl font-bold text-foreground">{batch.name}</span>
-          <ChevronDown
-            className={`size-5 text-foreground transition-transform ${pickerOpen ? "rotate-180" : ""}`}
-          />
-        </button>
-        {pickerOpen && (
-          <div className="border-t border-border pb-2">
-            <p className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Enrolled Batches
+      {/* Enrolled batches */}
+      <section className="bg-card px-4 pb-3 pt-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[13px] font-extrabold uppercase tracking-wide text-foreground">
+            Enrolled Batches
+          </h2>
+          <Link
+            to="/my-batches"
+            className="text-[12px] font-bold text-primary"
+          >
+            View All
+          </Link>
+        </div>
+
+        {enrolledBatches.length === 0 ? (
+          <div className="mt-3 rounded-xl border border-border px-3 py-5 text-center">
+            <p className="text-[13px] font-bold text-foreground">
+              No enrolled batches yet
             </p>
-            {enrolledBatches.map((b) => (
-              <button
-                key={b.id}
-                onClick={() => {
-                  setBatchId(b.id);
-                  setPickerOpen(false);
-                }}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left"
-              >
-                <span className="flex size-9 items-center justify-center rounded-lg bg-secondary text-base">
-                  📘
-                </span>
-                <span className="flex-1">
-                  <span className="block text-[15px] font-semibold text-foreground">
-                    {b.name}
+            <Link
+              to="/batches"
+              className="mt-3 inline-flex items-center gap-1 rounded-xl bg-foreground px-4 py-2.5 text-[13px] font-bold text-background"
+            >
+              Explore Batches
+              <ChevronRight className="size-4" />
+            </Link>
+          </div>
+        ) : (
+          <div className="no-scrollbar mt-3 flex gap-2.5 overflow-x-auto">
+            {enrolledBatches.map((b) => {
+              const active = b.id === batchId;
+              return (
+                <button
+                  key={b.id}
+                  onClick={() => setBatchId(b.id)}
+                  className={
+                    active
+                      ? "flex w-[190px] shrink-0 items-center gap-2 rounded-xl border border-primary bg-secondary px-2.5 py-2 text-left"
+                      : "flex w-[190px] shrink-0 items-center gap-2 rounded-xl border border-border px-2.5 py-2 text-left"
+                  }
+                >
+                  <span
+                    className="flex size-9 shrink-0 items-center justify-center rounded-lg text-[15px]"
+                    style={{ background: b.banner.from, color: b.banner.text }}
+                  >
+                    📘
                   </span>
-                  <span className="block text-xs text-muted-foreground">
-                    {b.free ? "Free" : "Paid"} · {b.language}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13px] font-extrabold leading-tight text-foreground">
+                      {b.name}
+                    </span>
+                    <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
+                      {b.free ? "Free" : "Paid"} · {b.language}
+                    </span>
                   </span>
-                </span>
-                {b.id === batchId && <Check className="size-5 text-primary" />}
-              </button>
-            ))}
+                  {active && <Check className="size-4 shrink-0 text-primary" />}
+                </button>
+              );
+            })}
           </div>
         )}
       </section>
+
 
       <div className="h-2 bg-muted" />
 
