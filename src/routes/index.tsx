@@ -6,26 +6,45 @@ import {
   CalendarDays,
   ChevronDown,
   ChevronRight,
-  CircleHelp,
   ClipboardCheck,
   CloudDownload,
-  FileText,
   GraduationCap,
-  HandHelping,
-  History,
-  LayoutDashboard,
-  Library,
   ListChecks,
   Swords,
+  X,
 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { PageShell } from "@/components/PageShell";
+import myBatchesIcon from "@/assets/my-batches.png.asset.json";
+import myHistoryIcon from "@/assets/my-history.png.asset.json";
+import myDoubtsIcon from "@/assets/my-doubts.png.asset.json";
+import dashboardIcon from "@/assets/dashboard.png.asset.json";
+import calendarIcon from "@/assets/calendar.png.asset.json";
+import pdfBankIcon from "@/assets/pdf-bank.png.asset.json";
+import libraryIcon from "@/assets/library.png.asset.json";
+import mentorshipIcon from "@/assets/mentorship.png.asset.json";
 import {
   enrolledBatches,
   exploreItems,
   exploreMore,
   quickAccess,
 } from "@/lib/app-data";
+
+const quickIcons: Record<string, string | undefined> = {
+  "My Batches": myBatchesIcon.url,
+  "My History": myHistoryIcon.url,
+  "My Doubts": myDoubtsIcon.url,
+  Dashboard: dashboardIcon.url,
+  "Real Test Se...": calendarIcon.url,
+  "PDF Bank": pdfBankIcon.url,
+};
+
+const exploreIcons: Record<string, string | undefined> = {
+  Library: libraryIcon.url,
+  Mentorship: mentorshipIcon.url,
+  "Test Series": calendarIcon.url,
+};
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,38 +78,68 @@ function StudyPage() {
 
       <section className="relative border-b border-border bg-card">
         {enrolledBatches.length === 0 ? (
-          <Link to="/batches" className="flex h-[53px] items-center justify-between px-4 text-[15px] font-extrabold text-foreground">
+          <Link to="/batches" className="flex h-[48px] items-center justify-between px-4 text-[14px] font-bold text-foreground">
             Explore Batches
             <ChevronRight className="size-5" />
           </Link>
         ) : (
-          <>
+          <button
+            onClick={() => setPickerOpen(true)}
+            className="flex h-[48px] w-full items-center gap-2 px-4 text-left"
+          >
+            <span className="truncate text-[15px] font-bold text-foreground">
+              {enrolledBatches.find((batch) => batch.id === batchId)?.name}
+            </span>
+            <ChevronDown className="size-5 shrink-0 text-foreground" strokeWidth={2.5} />
+          </button>
+        )}
+      </section>
+
+      {pickerOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+          <button
+            aria-label="Close"
+            onClick={() => setPickerOpen(false)}
+            className="flex-1 bg-foreground/40"
+          />
+          <div className="relative mx-auto w-full max-w-screen-sm rounded-t-2xl bg-card pb-6 pt-3">
             <button
-              onClick={() => setPickerOpen((open) => !open)}
-              className="flex h-[53px] w-full items-center gap-2 px-4 text-left"
+              aria-label="Close"
+              onClick={() => setPickerOpen(false)}
+              className="absolute -top-14 left-1/2 flex size-11 -translate-x-1/2 items-center justify-center rounded-full bg-card shadow-md"
             >
-              <span className="truncate text-[16px] font-extrabold text-foreground">
-                {enrolledBatches.find((batch) => batch.id === batchId)?.name}
-              </span>
-              <ChevronDown className={`size-5 shrink-0 text-foreground transition-transform ${pickerOpen ? "rotate-180" : ""}`} strokeWidth={2.5} />
+              <X className="size-6 text-foreground" strokeWidth={2.4} />
             </button>
-            {pickerOpen && (
-              <div className="absolute inset-x-0 top-full z-20 border-y border-border bg-card py-1 shadow-md">
-                {enrolledBatches.map((batch) => (
+            <div className="mx-auto h-1 w-10 rounded-full bg-border" />
+            <p className="mt-3 text-center text-[18px] font-bold text-foreground">
+              Select an Option
+            </p>
+            <p className="mt-3 border-b border-border px-4 pb-1.5 text-[13px] font-bold text-primary">
+              Enrolled Batches
+            </p>
+            <div className="max-h-[45vh] overflow-y-auto">
+              {enrolledBatches.map((batch) => {
+                const active = batch.id === batchId;
+                return (
                   <button
                     key={batch.id}
                     onClick={() => { setBatchId(batch.id); setPickerOpen(false); }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left text-[14px] font-bold text-foreground"
+                    className={`flex w-full items-center justify-between px-4 py-4 text-left ${active ? "bg-secondary" : ""}`}
                   >
-                    {batch.name}
-                    {batch.id === batchId && <span className="text-primary">✓</span>}
+                    <span className="text-[14px] font-bold text-foreground">{batch.name}</span>
+                    <span
+                      className={`flex size-5 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-border"}`}
+                    >
+                      {active && <span className="size-2.5 rounded-full bg-primary" />}
+                    </span>
                   </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </section>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
 
 
       <div className="h-2 bg-muted" />
@@ -98,17 +147,17 @@ function StudyPage() {
       {/* Today's class */}
       <section className="bg-card px-4 pb-4 pt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-extrabold text-foreground">Today&apos;s Class</h2>
+          <h2 className="text-[16px] font-bold text-foreground">Today&apos;s Class</h2>
           <button className="flex h-9 items-center gap-2 rounded-md border border-border px-3">
             <CalendarDays className="size-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">Weekly Schedule</span>
+            <span className="text-[13px] font-bold text-primary">Weekly Schedule</span>
           </button>
         </div>
         <div className="mt-5 flex h-[126px] items-center justify-center rounded-xl border border-border shadow-sm">
-          <p className="text-[14px] font-bold text-foreground">No Class scheduled!</p>
+          <p className="text-[13px] font-bold text-foreground">No Class scheduled!</p>
         </div>
         <button className="mt-5 flex w-full items-center justify-center gap-1 py-1">
-          <span className="text-[15px] font-bold text-primary">
+          <span className="text-[14px] font-bold text-primary">
             View All Classes
           </span>
           <ChevronRight className="size-5 text-primary" />
@@ -119,17 +168,22 @@ function StudyPage() {
 
       {/* Quick Access */}
       <section className="bg-card px-4 pb-7 pt-5">
-        <h2 className="text-[18px] font-extrabold text-foreground">Quick Access</h2>
+        <h2 className="text-[16px] font-bold text-foreground">Quick Access</h2>
         <div className="mt-5 grid grid-cols-3 gap-x-3 gap-y-4">
           {quickAccess.map((item, index) => {
-            const icons = [BookOpen, History, CircleHelp, LayoutDashboard, ClipboardCheck, CloudDownload, FileText, GraduationCap, Swords, Bookmark];
+            const icons = [BookOpen, BookOpen, BookOpen, BookOpen, ClipboardCheck, CloudDownload, BookOpen, GraduationCap, Swords, Bookmark];
             const Icon = icons[index] ?? BookOpen;
+            const img = quickIcons[item.label];
             const inner = (
               <>
                 <span className="flex size-12 items-center justify-center rounded-full bg-secondary">
-                  <Icon className="size-7 text-foreground" strokeWidth={1.7} />
+                  {img ? (
+                    <img src={img} alt="" className="size-8 object-contain" loading="lazy" />
+                  ) : (
+                    <Icon className="size-7 text-foreground" strokeWidth={1.7} />
+                  )}
                 </span>
-                <span className="mt-3 w-full truncate text-[13px] font-extrabold text-foreground">
+                <span className="mt-3 w-full truncate text-[12px] font-bold text-foreground">
                   {item.label}
                 </span>
               </>
@@ -148,6 +202,7 @@ function StudyPage() {
           })}
         </div>
       </section>
+
 
       <div className="h-2 bg-muted" />
 
