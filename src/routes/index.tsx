@@ -78,38 +78,68 @@ function StudyPage() {
 
       <section className="relative border-b border-border bg-card">
         {enrolledBatches.length === 0 ? (
-          <Link to="/batches" className="flex h-[53px] items-center justify-between px-4 text-[15px] font-extrabold text-foreground">
+          <Link to="/batches" className="flex h-[48px] items-center justify-between px-4 text-[14px] font-bold text-foreground">
             Explore Batches
             <ChevronRight className="size-5" />
           </Link>
         ) : (
-          <>
+          <button
+            onClick={() => setPickerOpen(true)}
+            className="flex h-[48px] w-full items-center gap-2 px-4 text-left"
+          >
+            <span className="truncate text-[15px] font-bold text-foreground">
+              {enrolledBatches.find((batch) => batch.id === batchId)?.name}
+            </span>
+            <ChevronDown className="size-5 shrink-0 text-foreground" strokeWidth={2.5} />
+          </button>
+        )}
+      </section>
+
+      {pickerOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+          <button
+            aria-label="Close"
+            onClick={() => setPickerOpen(false)}
+            className="flex-1 bg-foreground/40"
+          />
+          <div className="relative mx-auto w-full max-w-screen-sm rounded-t-2xl bg-card pb-6 pt-3">
             <button
-              onClick={() => setPickerOpen((open) => !open)}
-              className="flex h-[53px] w-full items-center gap-2 px-4 text-left"
+              aria-label="Close"
+              onClick={() => setPickerOpen(false)}
+              className="absolute -top-14 left-1/2 flex size-11 -translate-x-1/2 items-center justify-center rounded-full bg-card shadow-md"
             >
-              <span className="truncate text-[16px] font-extrabold text-foreground">
-                {enrolledBatches.find((batch) => batch.id === batchId)?.name}
-              </span>
-              <ChevronDown className={`size-5 shrink-0 text-foreground transition-transform ${pickerOpen ? "rotate-180" : ""}`} strokeWidth={2.5} />
+              <X className="size-6 text-foreground" strokeWidth={2.4} />
             </button>
-            {pickerOpen && (
-              <div className="absolute inset-x-0 top-full z-20 border-y border-border bg-card py-1 shadow-md">
-                {enrolledBatches.map((batch) => (
+            <div className="mx-auto h-1 w-10 rounded-full bg-border" />
+            <p className="mt-3 text-center text-[18px] font-bold text-foreground">
+              Select an Option
+            </p>
+            <p className="mt-3 border-b border-border px-4 pb-1.5 text-[13px] font-bold text-primary">
+              Enrolled Batches
+            </p>
+            <div className="max-h-[45vh] overflow-y-auto">
+              {enrolledBatches.map((batch) => {
+                const active = batch.id === batchId;
+                return (
                   <button
                     key={batch.id}
                     onClick={() => { setBatchId(batch.id); setPickerOpen(false); }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left text-[14px] font-bold text-foreground"
+                    className={`flex w-full items-center justify-between px-4 py-4 text-left ${active ? "bg-secondary" : ""}`}
                   >
-                    {batch.name}
-                    {batch.id === batchId && <span className="text-primary">✓</span>}
+                    <span className="text-[14px] font-bold text-foreground">{batch.name}</span>
+                    <span
+                      className={`flex size-5 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-border"}`}
+                    >
+                      {active && <span className="size-2.5 rounded-full bg-primary" />}
+                    </span>
                   </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </section>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
 
 
       <div className="h-2 bg-muted" />
