@@ -1,6 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, ChevronRight, CalendarDays, Check } from "lucide-react";
+import {
+  BookOpen,
+  Bookmark,
+  CalendarDays,
+  ChevronDown,
+  ChevronRight,
+  CircleHelp,
+  ClipboardCheck,
+  CloudDownload,
+  FileText,
+  GraduationCap,
+  HandHelping,
+  History,
+  LayoutDashboard,
+  Library,
+  ListChecks,
+  Swords,
+} from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { PageShell } from "@/components/PageShell";
 import {
@@ -31,6 +48,7 @@ export const Route = createFileRoute("/")({
 
 function StudyPage() {
   const [batchId, setBatchId] = useState(enrolledBatches[0]?.id ?? "");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [slide, setSlide] = useState(0);
 
@@ -39,66 +57,38 @@ function StudyPage() {
     <PageShell>
       <TopBar />
 
-      {/* Enrolled batches */}
-      <section className="bg-card px-4 pb-3 pt-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[13px] font-extrabold uppercase tracking-wide text-foreground">
-            Enrolled Batches
-          </h2>
-          <Link
-            to="/my-batches"
-            className="text-[12px] font-bold text-primary"
-          >
-            View All
-          </Link>
-        </div>
-
+      <section className="relative border-b border-border bg-card">
         {enrolledBatches.length === 0 ? (
-          <div className="mt-3 rounded-xl border border-border px-3 py-5 text-center">
-            <p className="text-[13px] font-bold text-foreground">
-              No enrolled batches yet
-            </p>
-            <Link
-              to="/batches"
-              className="mt-3 inline-flex items-center gap-1 rounded-xl bg-foreground px-4 py-2.5 text-[13px] font-bold text-background"
-            >
-              Explore Batches
-              <ChevronRight className="size-4" />
-            </Link>
-          </div>
+          <Link to="/batches" className="flex h-[53px] items-center justify-between px-4 text-[15px] font-extrabold text-foreground">
+            Explore Batches
+            <ChevronRight className="size-5" />
+          </Link>
         ) : (
-          <div className="no-scrollbar mt-3 flex gap-2.5 overflow-x-auto">
-            {enrolledBatches.map((b) => {
-              const active = b.id === batchId;
-              return (
-                <button
-                  key={b.id}
-                  onClick={() => setBatchId(b.id)}
-                  className={
-                    active
-                      ? "flex w-[190px] shrink-0 items-center gap-2 rounded-xl border border-primary bg-secondary px-2.5 py-2 text-left"
-                      : "flex w-[190px] shrink-0 items-center gap-2 rounded-xl border border-border px-2.5 py-2 text-left"
-                  }
-                >
-                  <span
-                    className="flex size-9 shrink-0 items-center justify-center rounded-lg text-[15px]"
-                    style={{ background: b.banner.from, color: b.banner.text }}
+          <>
+            <button
+              onClick={() => setPickerOpen((open) => !open)}
+              className="flex h-[53px] w-full items-center gap-2 px-4 text-left"
+            >
+              <span className="truncate text-[16px] font-extrabold text-foreground">
+                {enrolledBatches.find((batch) => batch.id === batchId)?.name}
+              </span>
+              <ChevronDown className={`size-5 shrink-0 text-foreground transition-transform ${pickerOpen ? "rotate-180" : ""}`} strokeWidth={2.5} />
+            </button>
+            {pickerOpen && (
+              <div className="absolute inset-x-0 top-full z-20 border-y border-border bg-card py-1 shadow-md">
+                {enrolledBatches.map((batch) => (
+                  <button
+                    key={batch.id}
+                    onClick={() => { setBatchId(batch.id); setPickerOpen(false); }}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left text-[14px] font-bold text-foreground"
                   >
-                    📘
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-extrabold leading-tight text-foreground">
-                      {b.name}
-                    </span>
-                    <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
-                      {b.free ? "Free" : "Paid"} · {b.language}
-                    </span>
-                  </span>
-                  {active && <Check className="size-4 shrink-0 text-primary" />}
-                </button>
-              );
-            })}
-          </div>
+                    {batch.name}
+                    {batch.id === batchId && <span className="text-primary">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </section>
 
@@ -106,19 +96,19 @@ function StudyPage() {
       <div className="h-2 bg-muted" />
 
       {/* Today's class */}
-      <section className="bg-card px-4 py-4">
+      <section className="bg-card px-4 pb-4 pt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-foreground">Today&apos;s Class</h2>
-          <button className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
+          <h2 className="text-[18px] font-extrabold text-foreground">Today&apos;s Class</h2>
+          <button className="flex h-9 items-center gap-2 rounded-md border border-border px-3">
             <CalendarDays className="size-4 text-primary" />
             <span className="text-sm font-semibold text-primary">Weekly Schedule</span>
           </button>
         </div>
-        <div className="mt-4 rounded-xl border border-border py-9 text-center">
-          <p className="text-[15px] text-foreground">No Class scheduled!</p>
+        <div className="mt-5 flex h-[126px] items-center justify-center rounded-xl border border-border shadow-sm">
+          <p className="text-[14px] font-bold text-foreground">No Class scheduled!</p>
         </div>
-        <button className="mt-4 flex w-full items-center justify-center gap-1 py-1">
-          <span className="text-[15px] font-semibold text-primary">
+        <button className="mt-5 flex w-full items-center justify-center gap-1 py-1">
+          <span className="text-[15px] font-bold text-primary">
             View All Classes
           </span>
           <ChevronRight className="size-5 text-primary" />
@@ -128,22 +118,24 @@ function StudyPage() {
       <div className="h-2 bg-muted" />
 
       {/* Quick Access */}
-      <section className="bg-card px-4 pb-6 pt-5">
-        <h2 className="text-xl font-bold text-foreground">Quick Access</h2>
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          {quickAccess.map((item) => {
+      <section className="bg-card px-4 pb-7 pt-5">
+        <h2 className="text-[18px] font-extrabold text-foreground">Quick Access</h2>
+        <div className="mt-5 grid grid-cols-3 gap-x-3 gap-y-4">
+          {quickAccess.map((item, index) => {
+            const icons = [BookOpen, History, CircleHelp, LayoutDashboard, ClipboardCheck, CloudDownload, FileText, GraduationCap, Swords, Bookmark];
+            const Icon = icons[index] ?? BookOpen;
             const inner = (
               <>
-                <span className="flex size-14 items-center justify-center rounded-full bg-secondary text-2xl">
-                  {item.icon}
+                <span className="flex size-12 items-center justify-center rounded-full bg-secondary">
+                  <Icon className="size-7 text-foreground" strokeWidth={1.7} />
                 </span>
-                <span className="mt-3 line-clamp-1 text-[15px] font-semibold text-foreground">
+                <span className="mt-3 w-full truncate text-[13px] font-extrabold text-foreground">
                   {item.label}
                 </span>
               </>
             );
             const cls =
-              "flex flex-col items-start rounded-xl border border-border bg-card p-3 shadow-sm";
+              "flex aspect-[1/1.08] min-w-0 flex-col items-start justify-center rounded-xl border border-border bg-card px-3 shadow-sm";
             return item.to ? (
               <Link key={item.label} to={item.to} className={cls}>
                 {inner}
@@ -224,31 +216,34 @@ function StudyPage() {
       <div className="h-2 bg-muted" />
 
       {/* Explore */}
-      <section className="bg-card px-4 py-5">
-        <h2 className="text-xl font-bold text-foreground">Explore</h2>
-        <p className="mt-0.5 text-[15px] text-muted-foreground">
+      <section className="bg-card px-4 py-6">
+        <h2 className="text-[18px] font-extrabold text-foreground">Explore</h2>
+        <p className="mt-0.5 text-[14px] font-semibold text-muted-foreground">
           Get additional guidance with these features
         </p>
         <div className="mt-4 space-y-3">
-          {[...exploreItems, ...(moreOpen ? exploreMore : [])].map((e) => (
+          {[...exploreItems, ...(moreOpen ? exploreMore : [])].map((e, index) => {
+            const icons = [ListChecks, Library, HandHelping, CircleHelp, BookOpen, Library];
+            const Icon = icons[index] ?? ListChecks;
+            return (
             <div
               key={e.title}
-              className="flex items-center gap-3 rounded-xl bg-muted px-3 py-3"
+              className="flex min-h-[74px] items-center gap-3 rounded-xl border border-border bg-card px-3 py-3 shadow-sm"
             >
-              <span className="flex size-11 items-center justify-center rounded-xl bg-card text-xl">
-                {e.icon}
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary">
+                <Icon className="size-6 text-foreground" strokeWidth={1.8} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-bold text-foreground">
+                <span className="block text-[14px] font-extrabold text-foreground">
                   {e.title}
                 </span>
-                <span className="block truncate text-[13px] text-muted-foreground">
+                <span className="mt-0.5 block truncate text-[12px] font-bold text-muted-foreground">
                   {e.desc}
                 </span>
               </span>
               <ChevronRight className="size-5 text-foreground" />
             </div>
-          ))}
+          )})}
         </div>
         <div className="mt-4 border-t border-border pt-4">
           <button
@@ -267,11 +262,11 @@ function StudyPage() {
 
       <div className="h-2 bg-muted" />
 
-      <section className="bg-card px-4 py-10">
-        <p className="text-2xl font-bold leading-snug text-muted-foreground">
+      <section className="bg-card px-4 py-14">
+        <p className="max-w-[310px] text-[20px] font-extrabold leading-relaxed text-muted-foreground">
           Padhlo chahe kahi se, manzil milegi yahi se...
         </p>
-        <p className="mt-3 text-[15px] text-muted-foreground">
+        <p className="mt-4 text-[15px] font-semibold text-muted-foreground">
           ❤️ From PhysicsWallah
         </p>
       </section>
