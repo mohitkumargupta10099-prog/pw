@@ -147,17 +147,17 @@ function StudyPage() {
       {/* Today's class */}
       <section className="bg-card px-4 pb-4 pt-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-extrabold text-foreground">Today&apos;s Class</h2>
+          <h2 className="text-[16px] font-bold text-foreground">Today&apos;s Class</h2>
           <button className="flex h-9 items-center gap-2 rounded-md border border-border px-3">
             <CalendarDays className="size-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">Weekly Schedule</span>
+            <span className="text-[13px] font-bold text-primary">Weekly Schedule</span>
           </button>
         </div>
         <div className="mt-5 flex h-[126px] items-center justify-center rounded-xl border border-border shadow-sm">
-          <p className="text-[14px] font-bold text-foreground">No Class scheduled!</p>
+          <p className="text-[13px] font-bold text-foreground">No Class scheduled!</p>
         </div>
         <button className="mt-5 flex w-full items-center justify-center gap-1 py-1">
-          <span className="text-[15px] font-bold text-primary">
+          <span className="text-[14px] font-bold text-primary">
             View All Classes
           </span>
           <ChevronRight className="size-5 text-primary" />
@@ -168,17 +168,22 @@ function StudyPage() {
 
       {/* Quick Access */}
       <section className="bg-card px-4 pb-7 pt-5">
-        <h2 className="text-[18px] font-extrabold text-foreground">Quick Access</h2>
+        <h2 className="text-[16px] font-bold text-foreground">Quick Access</h2>
         <div className="mt-5 grid grid-cols-3 gap-x-3 gap-y-4">
           {quickAccess.map((item, index) => {
-            const icons = [BookOpen, History, CircleHelp, LayoutDashboard, ClipboardCheck, CloudDownload, FileText, GraduationCap, Swords, Bookmark];
+            const icons = [BookOpen, BookOpen, BookOpen, BookOpen, ClipboardCheck, CloudDownload, BookOpen, GraduationCap, Swords, Bookmark];
             const Icon = icons[index] ?? BookOpen;
+            const img = quickIcons[item.label];
             const inner = (
               <>
                 <span className="flex size-12 items-center justify-center rounded-full bg-secondary">
-                  <Icon className="size-7 text-foreground" strokeWidth={1.7} />
+                  {img ? (
+                    <img src={img} alt="" className="size-8 object-contain" loading="lazy" />
+                  ) : (
+                    <Icon className="size-7 text-foreground" strokeWidth={1.7} />
+                  )}
                 </span>
-                <span className="mt-3 w-full truncate text-[13px] font-extrabold text-foreground">
+                <span className="mt-3 w-full truncate text-[12px] font-bold text-foreground">
                   {item.label}
                 </span>
               </>
@@ -197,6 +202,7 @@ function StudyPage() {
           })}
         </div>
       </section>
+
 
       <div className="h-2 bg-muted" />
 
