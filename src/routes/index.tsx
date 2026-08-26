@@ -6,26 +6,45 @@ import {
   CalendarDays,
   ChevronDown,
   ChevronRight,
-  CircleHelp,
   ClipboardCheck,
   CloudDownload,
-  FileText,
   GraduationCap,
-  HandHelping,
-  History,
-  LayoutDashboard,
-  Library,
   ListChecks,
   Swords,
+  X,
 } from "lucide-react";
 import { TopBar } from "@/components/TopBar";
 import { PageShell } from "@/components/PageShell";
+import myBatchesIcon from "@/assets/my-batches.png.asset.json";
+import myHistoryIcon from "@/assets/my-history.png.asset.json";
+import myDoubtsIcon from "@/assets/my-doubts.png.asset.json";
+import dashboardIcon from "@/assets/dashboard.png.asset.json";
+import calendarIcon from "@/assets/calendar.png.asset.json";
+import pdfBankIcon from "@/assets/pdf-bank.png.asset.json";
+import libraryIcon from "@/assets/library.png.asset.json";
+import mentorshipIcon from "@/assets/mentorship.png.asset.json";
 import {
   enrolledBatches,
   exploreItems,
   exploreMore,
   quickAccess,
 } from "@/lib/app-data";
+
+const quickIcons: Record<string, string | undefined> = {
+  "My Batches": myBatchesIcon.url,
+  "My History": myHistoryIcon.url,
+  "My Doubts": myDoubtsIcon.url,
+  Dashboard: dashboardIcon.url,
+  "Real Test Se...": calendarIcon.url,
+  "PDF Bank": pdfBankIcon.url,
+};
+
+const exploreIcons: Record<string, string | undefined> = {
+  Library: libraryIcon.url,
+  Mentorship: mentorshipIcon.url,
+  "Test Series": calendarIcon.url,
+};
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
