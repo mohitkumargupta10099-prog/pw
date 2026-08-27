@@ -13,27 +13,27 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-[74px] max-w-screen-sm items-stretch justify-between border-t border-border bg-card px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-2 shadow-sm">
+    <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto flex h-[58px] max-w-screen-sm items-stretch justify-between border-t border-border bg-card px-1 pb-[max(4px,env(safe-area-inset-bottom))] pt-1.5 shadow-sm">
       {items.map(({ to, label, Icon, badge }) => {
         const active = pathname === to;
         return (
           <Link
             key={to}
             to={to}
-            className="relative flex min-w-0 flex-1 flex-col items-center gap-1 py-0.5"
+            className="relative flex min-w-0 flex-1 flex-col items-center gap-0.5 py-0.5"
           >
             {active && (
-              <span className="absolute -top-2 h-1 w-10 rounded-full bg-foreground" />
+              <span className="absolute -top-1.5 h-0.5 w-8 rounded-full bg-foreground" />
             )}
             {badge && (
-              <span className="absolute -top-1 right-1.5 rounded-[4px] bg-badge px-1 text-[9px] font-semibold leading-4 text-badge-foreground">
+              <span className="absolute -top-0.5 right-1.5 rounded-[3px] bg-badge px-1 text-[8px] font-bold leading-3 text-badge-foreground">
                 {badge}
               </span>
             )}
             {Icon ? (
               <Icon
                 className={
-                  active ? "size-6 text-foreground" : "size-6 text-muted-foreground"
+                  active ? "size-5 text-foreground" : "size-5 text-muted-foreground"
                 }
                 strokeWidth={1.8}
               />
@@ -41,8 +41,8 @@ export function BottomNav() {
               <span
                 className={
                   active
-                    ? "flex size-6 items-center justify-center rounded-full border-[1.8px] border-foreground text-[13px] font-semibold text-foreground"
-                    : "flex size-6 items-center justify-center rounded-full border-[1.8px] border-muted-foreground text-[13px] font-semibold text-muted-foreground"
+                    ? "flex size-5 items-center justify-center rounded-full border-[1.6px] border-foreground text-[11px] font-bold text-foreground"
+                    : "flex size-5 items-center justify-center rounded-full border-[1.6px] border-muted-foreground text-[11px] font-bold text-muted-foreground"
                 }
               >
                 π
@@ -51,8 +51,8 @@ export function BottomNav() {
             <span
               className={
                 active
-                  ? "truncate text-[13px] font-extrabold text-foreground"
-                  : "truncate text-[13px] font-semibold text-muted-foreground"
+                  ? "truncate text-[10px] font-extrabold text-foreground"
+                  : "truncate text-[10px] font-bold text-muted-foreground"
               }
             >
               {label}

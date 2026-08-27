@@ -27,16 +27,16 @@ export const Route = createFileRoute("/store")({
   component: () => (
     <PageShell>
       <TopBar />
-      <section className="bg-card px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground">PW Store</h1>
-        <div className="mt-5 grid grid-cols-2 gap-4">
+      <section className="bg-card px-4 py-5">
+        <h1 className="text-[17px] font-bold text-foreground">PW Store</h1>
+        <div className="mt-4 grid grid-cols-2 gap-3.5">
           {items.map((i) => (
             <div key={i.name} className="rounded-xl border border-border p-3">
-              <div className="flex h-24 items-center justify-center rounded-lg bg-secondary text-3xl">
+              <div className="flex h-20 items-center justify-center rounded-lg bg-secondary text-[26px]">
                 📚
               </div>
-              <p className="mt-3 text-[14px] font-semibold text-foreground">{i.name}</p>
-              <p className="mt-1 text-[15px] font-bold text-foreground">₹{i.price}</p>
+              <p className="mt-2.5 text-[12px] font-bold text-foreground">{i.name}</p>
+              <p className="mt-1 text-[13px] font-bold text-foreground">₹{i.price}</p>
             </div>
           ))}
         </div>

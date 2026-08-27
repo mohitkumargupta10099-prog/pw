@@ -20,12 +20,12 @@ export const Route = createFileRoute("/pi")({
   component: () => (
     <PageShell>
       <TopBar />
-      <section className="bg-card px-4 py-10 text-center">
-        <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-secondary text-2xl font-bold text-primary">
+      <section className="bg-card px-4 py-8 text-center">
+        <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-secondary text-[20px] font-bold text-primary">
           π
         </span>
-        <h1 className="mt-5 text-2xl font-bold text-foreground">Pi</h1>
-        <p className="mt-2 text-[15px] text-muted-foreground">
+        <h1 className="mt-4 text-[17px] font-bold text-foreground">Pi</h1>
+        <p className="mt-2 text-[13px] font-bold text-muted-foreground">
           Your study assistant. Ask doubts, get instant explanations.
         </p>
       </section>
