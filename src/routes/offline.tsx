@@ -20,23 +20,23 @@ export const Route = createFileRoute("/offline")({
   component: () => (
     <PageShell>
       <TopBar />
-      <section className="bg-card px-4 py-6">
-        <h1 className="text-2xl font-bold text-foreground">Offline Centres</h1>
-        <p className="mt-1 text-[15px] text-muted-foreground">
+      <section className="bg-card px-4 py-5">
+        <h1 className="text-[17px] font-bold text-foreground">Offline Centres</h1>
+        <p className="mt-1 text-[13px] font-bold text-muted-foreground">
           Classroom programs near you
         </p>
-        <div className="mt-5 space-y-3">
+        <div className="mt-4 space-y-2.5">
           {["Vidyapeeth Kota", "Vidyapeeth Patna", "Vidyapeeth Delhi"].map((c) => (
             <div
               key={c}
               className="flex items-center gap-3 rounded-xl border border-border p-3"
             >
-              <span className="flex size-12 items-center justify-center rounded-xl bg-secondary text-xl">
+              <span className="flex size-11 items-center justify-center rounded-xl bg-secondary text-[18px]">
                 🏫
               </span>
               <span>
-                <span className="block text-[15px] font-bold text-foreground">{c}</span>
-                <span className="block text-[13px] text-muted-foreground">
+                <span className="block text-[13px] font-bold text-foreground">{c}</span>
+                <span className="block text-[11px] font-bold text-muted-foreground">
                   Admissions open
                 </span>
               </span>
