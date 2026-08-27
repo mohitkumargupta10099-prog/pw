@@ -272,27 +272,32 @@ function StudyPage() {
 
       {/* Explore */}
       <section className="bg-card px-4 py-6">
-        <h2 className="text-[18px] font-extrabold text-foreground">Explore</h2>
-        <p className="mt-0.5 text-[14px] font-semibold text-muted-foreground">
+        <h2 className="text-[16px] font-bold text-foreground">Explore</h2>
+        <p className="mt-0.5 text-[12px] font-bold text-muted-foreground">
           Get additional guidance with these features
         </p>
         <div className="mt-4 space-y-3">
           {[...exploreItems, ...(moreOpen ? exploreMore : [])].map((e, index) => {
-            const icons = [ListChecks, Library, HandHelping, CircleHelp, BookOpen, Library];
+            const icons = [ListChecks, BookOpen, BookOpen, BookOpen, BookOpen, BookOpen];
             const Icon = icons[index] ?? ListChecks;
+            const img = exploreIcons[e.title];
             return (
             <div
               key={e.title}
-              className="flex min-h-[74px] items-center gap-3 rounded-xl border border-border bg-card px-3 py-3 shadow-sm"
+              className="flex min-h-[70px] items-center gap-3 rounded-xl border border-border bg-card px-3 py-3 shadow-sm"
             >
               <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                <Icon className="size-6 text-foreground" strokeWidth={1.8} />
+                {img ? (
+                  <img src={img} alt="" className="size-7 object-contain" loading="lazy" />
+                ) : (
+                  <Icon className="size-6 text-foreground" strokeWidth={1.8} />
+                )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[14px] font-extrabold text-foreground">
+                <span className="block text-[13px] font-bold text-foreground">
                   {e.title}
                 </span>
-                <span className="mt-0.5 block truncate text-[12px] font-bold text-muted-foreground">
+                <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
                   {e.desc}
                 </span>
               </span>
@@ -305,7 +310,7 @@ function StudyPage() {
             onClick={() => setMoreOpen((v) => !v)}
             className="mx-auto flex items-center gap-2"
           >
-            <span className="text-[15px] font-semibold text-foreground">
+            <span className="text-[13px] font-bold text-foreground">
               {moreOpen ? "Explore Less" : "Explore More"}
             </span>
             <ChevronDown
@@ -318,13 +323,14 @@ function StudyPage() {
       <div className="h-2 bg-muted" />
 
       <section className="bg-card px-4 py-14">
-        <p className="max-w-[310px] text-[20px] font-extrabold leading-relaxed text-muted-foreground">
+        <p className="max-w-[300px] text-[17px] font-bold leading-relaxed text-muted-foreground">
           Padhlo chahe kahi se, manzil milegi yahi se...
         </p>
-        <p className="mt-4 text-[15px] font-semibold text-muted-foreground">
+        <p className="mt-4 text-[13px] font-bold text-muted-foreground">
           ❤️ From PhysicsWallah
         </p>
       </section>
+
     </PageShell>
   );
 }
