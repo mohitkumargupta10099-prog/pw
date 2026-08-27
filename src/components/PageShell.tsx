@@ -3,7 +3,7 @@ import { BottomNav } from "./BottomNav";
 
 export function PageShell({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto min-h-screen max-w-screen-sm bg-muted pb-20">
+    <div className="mx-auto min-h-screen max-w-screen-sm bg-muted pb-16">
       {children}
       <BottomNav />
     </div>
