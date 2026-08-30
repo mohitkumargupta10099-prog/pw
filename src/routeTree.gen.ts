@@ -18,6 +18,7 @@ import { Route as PiRouteImport } from './routes/pi'
 import { Route as SelectGoalRouteImport } from './routes/select-goal'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as BatchBatchIdRouteImport } from './routes/batch.$batchId'
+import { Route as TopicsBatchIdSubjectIdRouteImport } from './routes/topics.$batchId.$subjectId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const BatchBatchIdRoute = BatchBatchIdRouteImport.update({
   path: '/batch/$batchId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TopicsBatchIdSubjectIdRoute = TopicsBatchIdSubjectIdRouteImport.update({
+  id: '/topics/$batchId/$subjectId',
+  path: '/topics/$batchId/$subjectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/select-goal': typeof SelectGoalRoute
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
+  '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/select-goal': typeof SelectGoalRoute
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
+  '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/select-goal': typeof SelectGoalRoute
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
+  '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/select-goal'
     | '/store'
     | '/batch/$batchId'
+    | '/topics/$batchId/$subjectId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/select-goal'
     | '/store'
     | '/batch/$batchId'
+    | '/topics/$batchId/$subjectId'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/select-goal'
     | '/store'
     | '/batch/$batchId'
+    | '/topics/$batchId/$subjectId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   SelectGoalRoute: typeof SelectGoalRoute
   StoreRoute: typeof StoreRoute
   BatchBatchIdRoute: typeof BatchBatchIdRoute
+  TopicsBatchIdSubjectIdRoute: typeof TopicsBatchIdSubjectIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BatchBatchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/topics/$batchId/$subjectId': {
+      id: '/topics/$batchId/$subjectId'
+      path: '/topics/$batchId/$subjectId'
+      fullPath: '/topics/$batchId/$subjectId'
+      preLoaderRoute: typeof TopicsBatchIdSubjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   SelectGoalRoute: SelectGoalRoute,
   StoreRoute: StoreRoute,
   BatchBatchIdRoute: BatchBatchIdRoute,
+  TopicsBatchIdSubjectIdRoute: TopicsBatchIdSubjectIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
