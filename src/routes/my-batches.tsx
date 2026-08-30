@@ -25,7 +25,9 @@ export const Route = createFileRoute("/my-batches")({
 function MyBatchesPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"paid" | "free">("free");
-  const list = enrolledBatches.filter((b) => (tab === "free" ? b.free : !b.free));
+  const enrolled = useEnrolled();
+  const list = enrolled.filter((b) => (tab === "free" ? b.fee <= 0 : b.fee > 0));
+
 
   return (
     <div className="mx-auto min-h-screen max-w-screen-sm bg-muted pb-10">
