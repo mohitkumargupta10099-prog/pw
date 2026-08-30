@@ -19,6 +19,7 @@ import { Route as SelectGoalRouteImport } from './routes/select-goal'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as BatchBatchIdRouteImport } from './routes/batch.$batchId'
 import { Route as TopicsBatchIdSubjectIdRouteImport } from './routes/topics.$batchId.$subjectId'
+import { Route as ChapterBatchIdSubjectIdChapterIdRouteImport } from './routes/chapter.$batchId.$subjectId.$chapterId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,12 @@ const TopicsBatchIdSubjectIdRoute = TopicsBatchIdSubjectIdRouteImport.update({
   path: '/topics/$batchId/$subjectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChapterBatchIdSubjectIdChapterIdRoute =
+  ChapterBatchIdSubjectIdChapterIdRouteImport.update({
+    id: '/chapter/$batchId/$subjectId/$chapterId',
+    path: '/chapter/$batchId/$subjectId/$chapterId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
+  '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +102,7 @@ export interface FileRoutesByTo {
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
+  '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +116,7 @@ export interface FileRoutesById {
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
+  '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/batch/$batchId'
     | '/topics/$batchId/$subjectId'
+    | '/chapter/$batchId/$subjectId/$chapterId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/batch/$batchId'
     | '/topics/$batchId/$subjectId'
+    | '/chapter/$batchId/$subjectId/$chapterId'
   id:
     | '__root__'
     | '/'
@@ -145,6 +157,7 @@ export interface FileRouteTypes {
     | '/store'
     | '/batch/$batchId'
     | '/topics/$batchId/$subjectId'
+    | '/chapter/$batchId/$subjectId/$chapterId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +171,7 @@ export interface RootRouteChildren {
   StoreRoute: typeof StoreRoute
   BatchBatchIdRoute: typeof BatchBatchIdRoute
   TopicsBatchIdSubjectIdRoute: typeof TopicsBatchIdSubjectIdRoute
+  ChapterBatchIdSubjectIdChapterIdRoute: typeof ChapterBatchIdSubjectIdChapterIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +246,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicsBatchIdSubjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chapter/$batchId/$subjectId/$chapterId': {
+      id: '/chapter/$batchId/$subjectId/$chapterId'
+      path: '/chapter/$batchId/$subjectId/$chapterId'
+      fullPath: '/chapter/$batchId/$subjectId/$chapterId'
+      preLoaderRoute: typeof ChapterBatchIdSubjectIdChapterIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -246,6 +267,7 @@ const rootRouteChildren: RootRouteChildren = {
   StoreRoute: StoreRoute,
   BatchBatchIdRoute: BatchBatchIdRoute,
   TopicsBatchIdSubjectIdRoute: TopicsBatchIdSubjectIdRoute,
+  ChapterBatchIdSubjectIdChapterIdRoute: ChapterBatchIdSubjectIdChapterIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
