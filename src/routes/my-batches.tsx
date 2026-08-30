@@ -1,7 +1,8 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, CalendarDays, MessageCircle } from "lucide-react";
-import { enrolledBatches } from "@/lib/app-data";
+import { useEnrolled } from "@/lib/enrollment";
+
 
 export const Route = createFileRoute("/my-batches")({
   head: () => ({
