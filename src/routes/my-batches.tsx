@@ -1,7 +1,8 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, CalendarDays, MessageCircle } from "lucide-react";
-import { enrolledBatches } from "@/lib/app-data";
+import { useEnrolled } from "@/lib/enrollment";
+
 
 export const Route = createFileRoute("/my-batches")({
   head: () => ({
@@ -24,7 +25,9 @@ export const Route = createFileRoute("/my-batches")({
 function MyBatchesPage() {
   const router = useRouter();
   const [tab, setTab] = useState<"paid" | "free">("free");
-  const list = enrolledBatches.filter((b) => (tab === "free" ? b.free : !b.free));
+  const enrolled = useEnrolled();
+  const list = enrolled.filter((b) => (tab === "free" ? b.fee <= 0 : b.fee > 0));
+
 
   return (
     <div className="mx-auto min-h-screen max-w-screen-sm bg-muted pb-10">
@@ -61,54 +64,71 @@ function MyBatchesPage() {
         {list.map((b) => (
           <article key={b.id} className="rounded-2xl bg-card p-3.5 shadow-sm">
             <div className="flex items-center gap-2">
-              <h2 className="flex-1 text-[15px] font-bold text-foreground">{b.name}</h2>
-              {b.isNew && (
-                <span className="rounded-md bg-badge px-2 py-0.5 text-[11px] font-bold text-badge-foreground">
-                  New
-                </span>
-              )}
-              <MessageCircle className="size-5 text-foreground" />
+              <h2 className="flex-1 text-[13px] font-bold text-foreground">{b.name}</h2>
+              <span className="rounded-md bg-badge px-2 py-0.5 text-[10px] font-bold text-badge-foreground">
+                New
+              </span>
+              <MessageCircle className="size-4 text-foreground" />
             </div>
 
-            <div
-              className="relative mt-3 overflow-hidden rounded-xl px-4 py-8 text-center"
-              style={{
-                background: `linear-gradient(160deg, ${b.banner.from}, ${b.banner.to})`,
-              }}
-            >
-              <p
-                className="text-[18px] font-extrabold tracking-tight"
-                style={{ color: b.banner.text }}
-              >
-                {b.banner.title}
-              </p>
-              <span className="absolute bottom-2.5 left-2.5 rounded-md bg-card/80 px-2.5 py-1 text-[11px] font-bold text-foreground">
+            <div className="relative mt-3 overflow-hidden rounded-xl">
+              {b.image ? (
+                <img
+                  src={b.image}
+                  alt={b.name}
+                  loading="lazy"
+                  className="h-[140px] w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-[110px] items-center justify-center bg-secondary px-4 text-center">
+                  <p className="text-[16px] font-extrabold uppercase text-primary">
+                    {b.name}
+                  </p>
+                </div>
+              )}
+              <span className="absolute bottom-2.5 left-2.5 rounded-md bg-card/80 px-2.5 py-1 text-[10px] font-bold text-foreground">
                 {b.language}
               </span>
             </div>
 
-            <p className="mt-3 flex flex-wrap items-center gap-2 text-[12px] font-bold text-muted-foreground">
+            <p className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
               <CalendarDays className="size-3.5" />
-              Starts on <b className="text-foreground">{b.starts}</b> •  Ends on{" "}
-              <b className="text-foreground">{b.ends}</b>
+              Starts on <b className="text-foreground">{b.startDate}</b> • Ends on{" "}
+              <b className="text-foreground">{b.endDate}</b>
             </p>
 
             <div className="mt-3 grid grid-cols-2 gap-2.5 border-t border-border pt-3">
-              <button className="rounded-xl bg-secondary py-3 text-[13px] font-bold text-primary">
+              <Link
+                to="/batches"
+                className="rounded-xl bg-secondary py-2.5 text-center text-[12px] font-bold text-primary"
+              >
                 Similar Batches
-              </button>
-              <button className="rounded-xl bg-primary py-3 text-[13px] font-bold text-primary-foreground">
+              </Link>
+              <Link
+                to="/batch/$batchId"
+                params={{ batchId: b.id }}
+                className="rounded-xl bg-primary py-2.5 text-center text-[12px] font-bold text-primary-foreground"
+              >
                 Let's Study
-              </button>
+              </Link>
             </div>
           </article>
         ))}
         {list.length === 0 && (
-          <p className="py-20 text-center text-[13px] font-bold text-muted-foreground">
-            No {tab} batches yet
-          </p>
+          <div className="py-20 text-center">
+            <p className="text-[12px] font-bold text-muted-foreground">
+              No {tab} batches yet
+            </p>
+            <Link
+              to="/batches"
+              className="mt-3 inline-block rounded-xl bg-primary px-5 py-2.5 text-[12px] font-bold text-primary-foreground"
+            >
+              Explore Batches
+            </Link>
+          </div>
         )}
       </div>
     </div>
   );
 }
+

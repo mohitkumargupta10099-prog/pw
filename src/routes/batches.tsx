@@ -1,8 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, Search, ChevronRight, SlidersHorizontal } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  Menu,
+  Search,
+  ChevronRight,
+  SlidersHorizontal,
+  BookOpen,
+  CheckCircle2,
+} from "lucide-react";
 import { PageShell } from "@/components/PageShell";
-import { courses, otherBatchChips } from "@/lib/app-data";
+import { listBatches, type BatchCard } from "@/lib/pw-api.functions";
+import { enroll, useEnrolled } from "@/lib/enrollment";
 
 export const Route = createFileRoute("/batches")({
   head: () => ({
@@ -10,187 +20,229 @@ export const Route = createFileRoute("/batches")({
       { title: "Batches - PW Learn" },
       {
         name: "description",
-        content: "Browse online, power batch and test series courses for your goal.",
+        content: "Browse JEE, NEET, Class 10 and Class 12 batches and enroll instantly.",
       },
       { property: "og:title", content: "Batches - PW Learn" },
       {
         property: "og:description",
-        content: "Browse online, power batch and test series courses for your goal.",
+        content: "Browse JEE, NEET, Class 10 and Class 12 batches and enroll instantly.",
       },
     ],
   }),
   component: BatchesPage,
 });
 
-const tabs = [
-  { id: "online", label: "Online", icon: "🖥️" },
-  { id: "power", label: "Power Batch", icon: "⚡" },
-  { id: "test", label: "Test Series", icon: "📋" },
-];
-
+const categories = ["JEE", "NEET", "Class 10", "Class 12", "GATE"];
 const filters = ["All Filters", "Online", "Offline", "Power Batch", "State Board"];
 
 function BatchesPage() {
-  const [tab, setTab] = useState("online");
-  const [chip, setChip] = useState<string | null>(null);
+  const [category, setCategory] = useState(categories[0]!);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [popup, setPopup] = useState<string | null>(null);
+  const enrolled = useEnrolled();
+  const fetchBatches = useServerFn(listBatches);
+
+  const { data, isPending } = useQuery({
+    queryKey: ["batches", category, search, page],
+    queryFn: () => fetchBatches({ data: { category, search, page } }),
+    staleTime: 5 * 60_000,
+  });
+
+  function onEnroll(b: BatchCard) {
+    enroll({
+      id: b.id,
+      name: b.name,
+      byName: b.byName,
+      image: b.image,
+      language: b.language,
+      startDate: b.startDate,
+      endDate: b.endDate,
+      fee: b.fee,
+    });
+    setPopup(b.name);
+  }
 
   return (
     <PageShell>
-      <div className="bg-[#c9edf7]">
-        <div className="flex items-center gap-2.5 px-4 pb-2.5 pt-3.5">
+      <div className="sticky top-0 z-20 bg-card">
+        <div className="flex items-center gap-2.5 px-3 pb-2 pt-3">
           <Menu className="size-5 shrink-0 text-foreground" strokeWidth={2.2} />
-          <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
+          <div className="flex flex-1 items-center gap-2 rounded-full border border-border px-3 py-2">
             <Search className="size-4 text-muted-foreground" />
             <input
-              placeholder="Search for neet"
-              className="w-full bg-transparent text-[13px] font-bold outline-none placeholder:text-muted-foreground"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Search for batches"
+              className="w-full bg-transparent text-[12px] font-bold outline-none placeholder:text-muted-foreground"
             />
           </div>
         </div>
 
-        <Link
-          to="/select-goal"
-          className="mx-4 mb-2.5 flex items-center gap-2 rounded-xl bg-[#e8effc] px-3 py-2.5"
-        >
-          <span className="text-[13px]">👥</span>
-          <span className="flex-1 text-[13px] font-bold text-foreground">
-            Select Your Goal
-          </span>
-          <span className="text-[13px] font-bold text-primary">Change</span>
-        </Link>
-
-        <div className="flex gap-3 px-4 pb-3.5">
-          {tabs.map((t) => (
+        <div className="no-scrollbar flex gap-2 overflow-x-auto px-3 pb-2.5">
+          {categories.map((c) => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={c}
+              onClick={() => {
+                setCategory(c);
+                setPage(1);
+              }}
               className={
-                t.id === tab
-                  ? "flex flex-1 flex-col items-center gap-1 rounded-xl bg-[#0b74ec] px-2 py-2.5 text-primary-foreground shadow"
-                  : "flex flex-1 flex-col items-center gap-1 rounded-xl bg-[#dfe3e6] px-2 py-2.5 text-foreground"
+                c === category
+                  ? "shrink-0 rounded-full bg-foreground px-4 py-1.5 text-[12px] font-bold text-background"
+                  : "shrink-0 rounded-full border border-border px-4 py-1.5 text-[12px] font-bold text-foreground"
               }
             >
-              <span className="text-[16px]">{t.icon}</span>
-              <span className="text-[11px] font-bold">{t.label}</span>
+              {c}
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="bg-card">
-        <div className="flex items-center gap-3 px-4 py-2.5">
-          <span className="w-14 shrink-0 text-[10px] font-bold uppercase leading-tight text-foreground">
-            View other batches
-          </span>
-          <div className="no-scrollbar flex flex-1 gap-2.5 overflow-x-auto">
-            {otherBatchChips.map((c) => (
-              <button
-                key={c}
-                onClick={() => setChip(chip === c ? null : c)}
-                className={
-                  chip === c
-                    ? "shrink-0 rounded-xl border border-primary bg-secondary px-3.5 py-2.5 text-[12px] font-bold text-foreground"
-                    : "shrink-0 rounded-xl border border-border px-3.5 py-2.5 text-[12px] font-bold text-foreground"
-                }
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="px-4 pt-2">
-          <h2 className="text-[17px] font-bold text-foreground">
-            {tab === "online" ? "All Courses" : "Popular Courses"}
-          </h2>
-          {tab === "online" && (
-            <p className="mt-0.5 text-[12px] font-bold text-muted-foreground">
-              {courses.length} courses available
-            </p>
-          )}
-        </div>
-
-        <div className="no-scrollbar mt-2.5 flex gap-2.5 overflow-x-auto px-4 pb-3.5">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto border-t border-border px-3 py-2">
           {filters.map((f, i) => (
             <button
               key={f}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-[12px] font-bold text-foreground"
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold text-foreground"
             >
               {f}
-              {i === 0 && <SlidersHorizontal className="size-3.5" />}
+              {i === 0 && <SlidersHorizontal className="size-3" />}
             </button>
           ))}
         </div>
+      </div>
 
-        <div className="space-y-4 px-4 pb-6">
-          {courses.map((c) => (
+      <div className="space-y-3 bg-muted px-3 py-3">
+        {isPending &&
+          [0, 1, 2].map((i) => (
+            <div key={i} className="h-64 animate-pulse rounded-2xl bg-card" />
+          ))}
+
+        {data?.items.map((b) => {
+          const already = enrolled.some((e) => e.id === b.id);
+          return (
             <article
-              key={c.id}
-              className="overflow-hidden rounded-xl border border-border bg-card"
+              key={b.id}
+              className="overflow-hidden rounded-2xl border border-border bg-card"
             >
-              <div
-                className="px-4 py-5 text-center"
-                style={{
-                  background: `linear-gradient(160deg, ${c.banner.from}, ${c.banner.to})`,
-                }}
-              >
-                {c.banner.sub && (
-                  <p className="text-[12px] font-bold text-foreground">
-                    🏅 {c.banner.sub}
+              {b.image ? (
+                <img
+                  src={b.image}
+                  alt={b.name}
+                  loading="lazy"
+                  className="h-[150px] w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-[110px] items-center justify-center bg-secondary px-4 text-center">
+                  <p className="text-[16px] font-extrabold uppercase text-primary">
+                    {b.name}
                   </p>
-                )}
-                <p
-                  className="mt-2 text-[18px] font-extrabold tracking-tight"
-                  style={{ color: c.banner.text }}
-                >
-                  {c.banner.title}
-                </p>
-                <p className="mt-5 text-[30px]">👩‍🎓👨‍🏫👩‍🏫</p>
-              </div>
+                </div>
+              )}
 
-              <div className="px-4 py-3">
+              <div className="px-3.5 py-3">
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-[13px] font-bold text-tag">{c.tag}</span>
-                  <span className="rounded-md border border-border px-2 py-0.5 text-[10px] font-bold text-foreground">
-                    {c.language}
+                  <span className="text-[12px] font-bold text-tag">{category}</span>
+                  <span className="rounded-md border border-border px-2 py-0.5 text-[9px] font-bold uppercase text-foreground">
+                    {b.language}
                   </span>
                 </div>
-                <h3 className="mt-2 text-[15px] font-bold text-foreground">{c.title}</h3>
-                <p className="mt-1.5 flex items-center gap-2 text-[12px] font-bold text-foreground">
-                  📖 {c.exam}
+                <h3 className="mt-1.5 text-[14px] font-bold leading-snug text-foreground">
+                  {b.name}
+                </h3>
+                <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-foreground">
+                  <BookOpen className="size-3.5" /> {b.byName || "PW Batch"}
                 </p>
-                <p className="mt-1 flex items-center gap-2 text-[12px] font-bold text-foreground">
-                  <span className="size-2 rounded-full bg-destructive" />
-                  {c.status}
+                <p className="mt-1 flex items-center gap-1.5 text-[11px] font-bold text-foreground">
+                  <span className="size-1.5 rounded-full bg-destructive" />
+                  Ongoing <span className="text-muted-foreground">|</span> Started on{" "}
+                  {b.startDate}
                 </p>
 
-                <div className="mt-3 flex items-center gap-3">
+                <div className="mt-3 flex items-center gap-2.5">
                   <div className="flex-1">
-                    <p className="text-[14px] font-bold text-foreground">
-                      ₹{c.price}{" "}
-                      <span className="text-[12px] font-bold text-muted-foreground line-through">
-                        ₹{c.mrp}
+                    <p className="text-[13px] font-bold text-foreground">
+                      ₹{b.fee.toLocaleString("en-IN")}{" "}
+                      <span className="text-[11px] font-bold text-muted-foreground line-through">
+                        ₹{Math.round(b.fee * 1.6).toLocaleString("en-IN")}
                       </span>
                     </p>
-                    <p className="text-[12px] font-bold text-success">
-                      {c.off}% OFF
-                    </p>
+                    <p className="text-[11px] font-bold text-success">38% OFF</p>
                   </div>
-                  <button className="rounded-xl bg-foreground px-5 py-2.5 text-[12px] font-bold text-background">
-                    Buy Now
-                  </button>
                   <button
-                    aria-label="Details"
+                    onClick={() => onEnroll(b)}
+                    disabled={already}
+                    className={
+                      already
+                        ? "rounded-xl border border-success px-4 py-2.5 text-[12px] font-bold text-success"
+                        : "rounded-xl bg-foreground px-5 py-2.5 text-[12px] font-bold text-background"
+                    }
+                  >
+                    {already ? "Enrolled" : "Enroll"}
+                  </button>
+                  <Link
+                    to="/batch/$batchId"
+                    params={{ batchId: b.id }}
+                    aria-label="Batch details"
                     className="rounded-xl border border-border p-2.5"
                   >
                     <ChevronRight className="size-4 text-foreground" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             </article>
-          ))}
-        </div>
+          );
+        })}
+
+        {data?.hasMore && (
+          <button
+            onClick={() => setPage((p) => p + 1)}
+            className="w-full rounded-xl border border-border bg-card py-3 text-[12px] font-bold text-primary"
+          >
+            Load more batches
+          </button>
+        )}
+        {data && data.items.length === 0 && (
+          <p className="py-20 text-center text-[12px] font-bold text-muted-foreground">
+            No batches found
+          </p>
+        )}
       </div>
+
+      {popup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-8">
+          <button
+            aria-label="Close"
+            onClick={() => setPopup(null)}
+            className="absolute inset-0 bg-foreground/50"
+          />
+          <div className="relative w-full max-w-xs rounded-2xl bg-card p-5 text-center shadow-xl">
+            <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-success/10">
+              <CheckCircle2 className="size-9 text-success" strokeWidth={2.2} />
+            </span>
+            <p className="mt-3 text-[15px] font-extrabold text-foreground">
+              Enrolled Successfully!
+            </p>
+            <p className="mt-1 text-[11px] font-bold text-muted-foreground">{popup}</p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setPopup(null)}
+                className="rounded-xl bg-secondary py-2.5 text-[12px] font-bold text-primary"
+              >
+                Keep Browsing
+              </button>
+              <Link
+                to="/my-batches"
+                className="rounded-xl bg-primary py-2.5 text-[12px] font-bold text-primary-foreground"
+              >
+                My Batches
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </PageShell>
   );
 }
