@@ -23,12 +23,12 @@ import calendarIcon from "@/assets/calendar.png.asset.json";
 import pdfBankIcon from "@/assets/pdf-bank.png.asset.json";
 import libraryIcon from "@/assets/library.png.asset.json";
 import mentorshipIcon from "@/assets/mentorship.png.asset.json";
-import {
-  enrolledBatches,
-  exploreItems,
-  exploreMore,
-  quickAccess,
-} from "@/lib/app-data";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { todaysSchedule } from "@/lib/pw-api.functions";
+import { useEnrolled } from "@/lib/enrollment";
+import { exploreItems, exploreMore, quickAccess } from "@/lib/app-data";
+
 
 const quickIcons: Record<string, string | undefined> = {
   "My Batches": myBatchesIcon.url,
