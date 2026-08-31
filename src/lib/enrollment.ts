@@ -11,7 +11,7 @@ export type EnrolledBatch = {
   fee: number;
 };
 
-const KEY = "pw-enrolled-batches";
+const KEY = "pw-enrolled-batches-v2";
 const listeners = new Set<() => void>();
 let snapshot: EnrolledBatch[] = [];
 let loaded = false;
