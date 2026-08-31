@@ -132,22 +132,23 @@ function StudyPage() {
             </p>
             <div className="max-h-[45vh] overflow-y-auto">
               {enrolledBatches.map((batch) => {
-                const active = batch.id === batchId;
+                const selected = batch.id === batchId;
                 return (
                   <button
                     key={batch.id}
-                    onClick={() => { setBatchId(batch.id); setPickerOpen(false); }}
-                    className={`flex w-full items-center justify-between px-4 py-3.5 text-left ${active ? "bg-secondary" : ""}`}
+                    onClick={() => { setSelectedId(batch.id); setPickerOpen(false); }}
+                    className={`flex w-full items-center justify-between px-4 py-3.5 text-left ${selected ? "bg-secondary" : ""}`}
                   >
                     <span className="text-[13px] font-bold text-foreground">{batch.name}</span>
                     <span
-                      className={`flex size-5 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-border"}`}
+                      className={`flex size-5 items-center justify-center rounded-full border-2 ${selected ? "border-primary" : "border-border"}`}
                     >
-                      {active && <span className="size-2.5 rounded-full bg-primary" />}
+                      {selected && <span className="size-2.5 rounded-full bg-primary" />}
                     </span>
                   </button>
                 );
               })}
+
             </div>
           </div>
         </div>
