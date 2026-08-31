@@ -23,12 +23,12 @@ import calendarIcon from "@/assets/calendar.png.asset.json";
 import pdfBankIcon from "@/assets/pdf-bank.png.asset.json";
 import libraryIcon from "@/assets/library.png.asset.json";
 import mentorshipIcon from "@/assets/mentorship.png.asset.json";
-import {
-  enrolledBatches,
-  exploreItems,
-  exploreMore,
-  quickAccess,
-} from "@/lib/app-data";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { todaysSchedule } from "@/lib/pw-api.functions";
+import { useEnrolled } from "@/lib/enrollment";
+import { exploreItems, exploreMore, quickAccess } from "@/lib/app-data";
+
 
 const quickIcons: Record<string, string | undefined> = {
   "My Batches": myBatchesIcon.url,
@@ -66,18 +66,30 @@ export const Route = createFileRoute("/")({
 });
 
 function StudyPage() {
-  const [batchId, setBatchId] = useState(enrolledBatches[0]?.id ?? "");
+  const enrolledBatches = useEnrolled();
+  const [selectedId, setSelectedId] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [slide, setSlide] = useState(0);
 
+  const active =
+    enrolledBatches.find((b) => b.id === selectedId) ?? enrolledBatches[0] ?? null;
+  const batchId = active?.id ?? "";
+
+  const getSchedule = useServerFn(todaysSchedule);
+  const schedule = useQuery({
+    queryKey: ["todays-schedule", batchId],
+    queryFn: () => getSchedule({ data: { batchId } }),
+    enabled: Boolean(batchId),
+    staleTime: 5 * 60_000,
+  });
 
   return (
     <PageShell>
       <TopBar />
 
       <section className="relative border-b border-border bg-card">
-        {enrolledBatches.length === 0 ? (
+        {!active ? (
           <Link to="/batches" className="flex h-[44px] items-center justify-between px-4 text-[13px] font-bold text-foreground">
             Explore Batches
             <ChevronRight className="size-4" />
@@ -88,12 +100,13 @@ function StudyPage() {
             className="flex h-[44px] w-full items-center gap-2 px-4 text-left"
           >
             <span className="truncate text-[13px] font-bold text-foreground">
-              {enrolledBatches.find((batch) => batch.id === batchId)?.name}
+              {active.name}
             </span>
             <ChevronDown className="size-4 shrink-0 text-foreground" strokeWidth={2.5} />
           </button>
         )}
       </section>
+
 
       {pickerOpen && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
@@ -119,22 +132,23 @@ function StudyPage() {
             </p>
             <div className="max-h-[45vh] overflow-y-auto">
               {enrolledBatches.map((batch) => {
-                const active = batch.id === batchId;
+                const selected = batch.id === batchId;
                 return (
                   <button
                     key={batch.id}
-                    onClick={() => { setBatchId(batch.id); setPickerOpen(false); }}
-                    className={`flex w-full items-center justify-between px-4 py-3.5 text-left ${active ? "bg-secondary" : ""}`}
+                    onClick={() => { setSelectedId(batch.id); setPickerOpen(false); }}
+                    className={`flex w-full items-center justify-between px-4 py-3.5 text-left ${selected ? "bg-secondary" : ""}`}
                   >
                     <span className="text-[13px] font-bold text-foreground">{batch.name}</span>
                     <span
-                      className={`flex size-5 items-center justify-center rounded-full border-2 ${active ? "border-primary" : "border-border"}`}
+                      className={`flex size-5 items-center justify-center rounded-full border-2 ${selected ? "border-primary" : "border-border"}`}
                     >
-                      {active && <span className="size-2.5 rounded-full bg-primary" />}
+                      {selected && <span className="size-2.5 rounded-full bg-primary" />}
                     </span>
                   </button>
                 );
               })}
+
             </div>
           </div>
         </div>
@@ -153,16 +167,48 @@ function StudyPage() {
             <span className="text-[11px] font-bold text-primary">Weekly Schedule</span>
           </button>
         </div>
-        <div className="mt-4 flex h-[110px] items-center justify-center rounded-xl border border-border shadow-sm">
-          <p className="text-[12px] font-bold text-foreground">No Class scheduled!</p>
-        </div>
-        <button className="mt-4 flex w-full items-center justify-center gap-1 py-1">
-          <span className="text-[12px] font-bold text-primary">
-            View All Classes
-          </span>
-          <ChevronRight className="size-4 text-primary" />
-        </button>
+        {schedule.data && schedule.data.length > 0 ? (
+          <div className="mt-4 space-y-2.5">
+            {schedule.data.map((c) => (
+              <div
+                key={c.id}
+                className="rounded-xl border border-border p-3 shadow-sm"
+              >
+                <p className="text-[12px] font-bold text-foreground">{c.topic}</p>
+                <p className="mt-1 text-[11px] font-bold text-muted-foreground">
+                  {c.subject}
+                  {c.startTime ? ` • ${c.startTime} - ${c.endTime}` : ""}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-4 flex h-[110px] items-center justify-center rounded-xl border border-border shadow-sm">
+            <p className="text-[12px] font-bold text-foreground">
+              {batchId ? "No Class scheduled!" : "Enroll in a batch to see classes"}
+            </p>
+          </div>
+        )}
+        {batchId ? (
+          <Link
+            to="/batch/$batchId"
+            params={{ batchId }}
+            className="mt-4 flex w-full items-center justify-center gap-1 py-1"
+          >
+            <span className="text-[12px] font-bold text-primary">View All Classes</span>
+            <ChevronRight className="size-4 text-primary" />
+          </Link>
+        ) : (
+          <Link
+            to="/batches"
+            className="mt-4 flex w-full items-center justify-center gap-1 py-1"
+          >
+            <span className="text-[12px] font-bold text-primary">Explore Batches</span>
+            <ChevronRight className="size-4 text-primary" />
+          </Link>
+        )}
       </section>
+
 
       <div className="h-2 bg-muted" />
 
