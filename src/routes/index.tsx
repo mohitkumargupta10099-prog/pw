@@ -66,18 +66,30 @@ export const Route = createFileRoute("/")({
 });
 
 function StudyPage() {
-  const [batchId, setBatchId] = useState(enrolledBatches[0]?.id ?? "");
+  const enrolledBatches = useEnrolled();
+  const [selectedId, setSelectedId] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [slide, setSlide] = useState(0);
 
+  const active =
+    enrolledBatches.find((b) => b.id === selectedId) ?? enrolledBatches[0] ?? null;
+  const batchId = active?.id ?? "";
+
+  const getSchedule = useServerFn(todaysSchedule);
+  const schedule = useQuery({
+    queryKey: ["todays-schedule", batchId],
+    queryFn: () => getSchedule({ data: { batchId } }),
+    enabled: Boolean(batchId),
+    staleTime: 5 * 60_000,
+  });
 
   return (
     <PageShell>
       <TopBar />
 
       <section className="relative border-b border-border bg-card">
-        {enrolledBatches.length === 0 ? (
+        {!active ? (
           <Link to="/batches" className="flex h-[44px] items-center justify-between px-4 text-[13px] font-bold text-foreground">
             Explore Batches
             <ChevronRight className="size-4" />
@@ -88,12 +100,13 @@ function StudyPage() {
             className="flex h-[44px] w-full items-center gap-2 px-4 text-left"
           >
             <span className="truncate text-[13px] font-bold text-foreground">
-              {enrolledBatches.find((batch) => batch.id === batchId)?.name}
+              {active.name}
             </span>
             <ChevronDown className="size-4 shrink-0 text-foreground" strokeWidth={2.5} />
           </button>
         )}
       </section>
+
 
       {pickerOpen && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
