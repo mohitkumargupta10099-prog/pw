@@ -213,6 +213,7 @@ export const chapterContents = createServerFn({ method: "GET" })
       )) ?? [];
     const out: {
       id: string;
+      scheduleId: string;
       title: string;
       subtitle: string;
       image: string;
@@ -224,9 +225,11 @@ export const chapterContents = createServerFn({ method: "GET" })
       const x = (wrap["data"] ?? {}) as Record<string, unknown>;
       const video = x["videoDetails"] as Record<string, unknown> | undefined;
       const homework = (x["homeworkIds"] as unknown[]) ?? [];
+      const scheduleId = String(x["_id"] ?? "");
       if (data.contentType === "LECTURES") {
         out.push({
-          id: String(x["_id"] ?? out.length),
+          id: scheduleId || String(out.length),
+          scheduleId,
           title: String(x["topic"] ?? video?.["name"] ?? "Lecture"),
           subtitle: String(x["lectureType"] ?? "Video"),
           image: String(video?.["image"] ?? ""),
@@ -240,6 +243,7 @@ export const chapterContents = createServerFn({ method: "GET" })
           const att = atts[0] as Record<string, string> | undefined;
           out.push({
             id: String(hw["_id"] ?? out.length),
+            scheduleId,
             title: String(hw["topic"] ?? "Note"),
             subtitle: att?.["name"] ?? String(hw["note"] ?? "PDF"),
             image: "",
@@ -251,6 +255,81 @@ export const chapterContents = createServerFn({ method: "GET" })
     }
     return out;
   });
+
+export const scheduleDetails = createServerFn({ method: "GET" })
+  .inputValidator(
+    (input: { batchId: string; subjectId: string; scheduleId: string }) => input,
+  )
+  .handler(async ({ data }) => {
+    const { apiGet } = await import("./pw-api.server");
+    const d = await apiGet<Record<string, unknown>>(
+      `/v1/batches/${data.batchId}/subject/${data.subjectId}/schedule/${data.scheduleId}/schedule-details`,
+    );
+    if (!d) return null;
+    const notes = ((d["homeworkIds"] as unknown[]) ?? []).flatMap((h) => {
+      const hw = h as Record<string, unknown>;
+      return ((hw["attachmentIds"] as unknown[]) ?? []).map((a) => {
+        const att = a as Record<string, string>;
+        return {
+          id: String(hw["_id"] ?? att["_id"]),
+          homeworkId: String(hw["_id"] ?? ""),
+          title: String(hw["topic"] ?? att["name"] ?? "Notes"),
+          name: String(att["name"] ?? "PDF"),
+          url:
+            att["baseUrl"] && att["key"] ? `${att["baseUrl"]}${att["key"]}` : "",
+        };
+      });
+    });
+    const quizzes = ((d["exerciseIds"] as unknown[]) ?? []).flatMap((e) => {
+      const ex = e as Record<string, unknown>;
+      return ((ex["content"] as unknown[]) ?? []).map((c) => {
+        const ct = (c as Record<string, unknown>)["exerciseId"] as
+          | Record<string, unknown>
+          | undefined;
+        return {
+          id: String(ct?.["_id"] ?? ex["_id"]),
+          name: String(ct?.["name"] ?? ex["title"] ?? "DPP Quiz"),
+          totalQuestions: Number(ct?.["totalQuestions"] ?? 0),
+          totalMarks: Number(ct?.["totalMarks"] ?? 0),
+          maxDuration: Number(ct?.["maxDuration"] ?? 0),
+        };
+      });
+    });
+    const video = d["videoDetails"] as Record<string, unknown> | undefined;
+    return {
+      id: String(d["_id"] ?? ""),
+      topic: String(d["topic"] ?? "Lecture"),
+      date: String(d["startTime"] ?? d["date"] ?? ""),
+      status: String(d["status"] ?? ""),
+      image: String(video?.["image"] ?? d["previewImageUrl"] ?? ""),
+      duration: String(video?.["duration"] ?? ""),
+      videoUrl: String(video?.["videoUrl"] ?? d["url"] ?? ""),
+      notes,
+      quizzes,
+    };
+  });
+
+export const testInstructions = createServerFn({ method: "GET" })
+  .inputValidator((input: { testId: string }) => input)
+  .handler(async ({ data }) => {
+    const { apiGet } = await import("./pw-api.server");
+    const d = await apiGet<Record<string, unknown>>(
+      `/v3/test-service/tests/${data.testId}/instructions`,
+    );
+    if (!d) return null;
+    return {
+      id: String(d["_id"] ?? data.testId),
+      name: String(d["name"] ?? "Test"),
+      maxDuration: Number(d["maxDuration"] ?? 0),
+      totalMarks: Number(d["totalMarks"] ?? 0),
+      totalQuestions: Number(d["totalQuestions"] ?? 0),
+      isSubjective: Boolean(d["isSubjective"]),
+      languages: ((d["languageCodes"] as unknown[]) ?? []).map((l) =>
+        String((l as Record<string, unknown>)["language"] ?? ""),
+      ),
+    };
+  });
+
 
 export const chapterDpp = createServerFn({ method: "GET" })
   .inputValidator(
