@@ -138,10 +138,20 @@ export const communityPosts = createServerFn({ method: "GET" })
     const first = channels[0] as Record<string, unknown> | undefined;
     if (!first) return { channel: "", posts: [] };
     const channelId = String(first["_id"]);
-    const posts =
-      (await apiGet<unknown[]>(
+    const res =
+      (await apiGet<{ posts?: unknown[] }>(
         `/v3/community/posts/v2?channelId=${channelId}&page=1&timestamp=${Math.floor(Date.now() / 1000)}`,
-      )) ?? [];
+      )) ?? {};
+    const posts = Array.isArray(res) ? (res as unknown[]) : (res.posts ?? []);
+    const clean = (s: string) => {
+      let t = s;
+      try {
+        t = decodeURIComponent(s);
+      } catch {
+        /* keep raw */
+      }
+      return t.replace(/<[^>]*>/g, "").trim();
+    };
     return {
       channel: String(first["name"] ?? "Student Discussion Channel"),
       posts: posts.slice(0, 20).map((p) => {
@@ -150,14 +160,18 @@ export const communityPosts = createServerFn({ method: "GET" })
         const name =
           `${(user?.["firstName"] as string) ?? ""} ${(user?.["lastName"] as string) ?? ""}`.trim() ||
           String(user?.["name"] ?? "Student");
+        const views = x["views"];
         return {
           id: String(x["_id"]),
           name,
-          text: String(x["text"] ?? x["content"] ?? x["message"] ?? ""),
-          views: Number(x["viewCount"] ?? x["views"] ?? 0),
-          comments: Number(x["commentCount"] ?? 0),
+          text: clean(String(x["description"] ?? x["text"] ?? x["content"] ?? "")),
+          views: Array.isArray(views)
+            ? Number(views[0] ?? 0)
+            : Number(x["totalUniqueViews"] ?? 0),
+          comments: Number(x["total_comments"] ?? x["commentCount"] ?? 0),
           createdAt: String(x["createdAt"] ?? ""),
         };
+
       }),
     };
   });
