@@ -20,6 +20,8 @@ import { Route as StoreRouteImport } from './routes/store'
 import { Route as BatchBatchIdRouteImport } from './routes/batch.$batchId'
 import { Route as TopicsBatchIdSubjectIdRouteImport } from './routes/topics.$batchId.$subjectId'
 import { Route as ChapterBatchIdSubjectIdChapterIdRouteImport } from './routes/chapter.$batchId.$subjectId.$chapterId'
+import { Route as LectureBatchIdSubjectIdScheduleIdRouteImport } from './routes/lecture.$batchId.$subjectId.$scheduleId'
+import { Route as PdfBatchIdSubjectIdScheduleIdRouteImport } from './routes/pdf.$batchId.$subjectId.$scheduleId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,6 +79,18 @@ const ChapterBatchIdSubjectIdChapterIdRoute =
     path: '/chapter/$batchId/$subjectId/$chapterId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LectureBatchIdSubjectIdScheduleIdRoute =
+  LectureBatchIdSubjectIdScheduleIdRouteImport.update({
+    id: '/lecture/$batchId/$subjectId/$scheduleId',
+    path: '/lecture/$batchId/$subjectId/$scheduleId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PdfBatchIdSubjectIdScheduleIdRoute =
+  PdfBatchIdSubjectIdScheduleIdRouteImport.update({
+    id: '/pdf/$batchId/$subjectId/$scheduleId',
+    path: '/pdf/$batchId/$subjectId/$scheduleId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -90,6 +104,8 @@ export interface FileRoutesByFullPath {
   '/batch/$batchId': typeof BatchBatchIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
   '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
+  '/lecture/$batchId/$subjectId/$scheduleId': typeof LectureBatchIdSubjectIdScheduleIdRoute
+  '/pdf/$batchId/$subjectId/$scheduleId': typeof PdfBatchIdSubjectIdScheduleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -103,6 +119,8 @@ export interface FileRoutesByTo {
   '/batch/$batchId': typeof BatchBatchIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
   '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
+  '/lecture/$batchId/$subjectId/$scheduleId': typeof LectureBatchIdSubjectIdScheduleIdRoute
+  '/pdf/$batchId/$subjectId/$scheduleId': typeof PdfBatchIdSubjectIdScheduleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,6 +135,8 @@ export interface FileRoutesById {
   '/batch/$batchId': typeof BatchBatchIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
   '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
+  '/lecture/$batchId/$subjectId/$scheduleId': typeof LectureBatchIdSubjectIdScheduleIdRoute
+  '/pdf/$batchId/$subjectId/$scheduleId': typeof PdfBatchIdSubjectIdScheduleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,6 +152,8 @@ export interface FileRouteTypes {
     | '/batch/$batchId'
     | '/topics/$batchId/$subjectId'
     | '/chapter/$batchId/$subjectId/$chapterId'
+    | '/lecture/$batchId/$subjectId/$scheduleId'
+    | '/pdf/$batchId/$subjectId/$scheduleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -145,6 +167,8 @@ export interface FileRouteTypes {
     | '/batch/$batchId'
     | '/topics/$batchId/$subjectId'
     | '/chapter/$batchId/$subjectId/$chapterId'
+    | '/lecture/$batchId/$subjectId/$scheduleId'
+    | '/pdf/$batchId/$subjectId/$scheduleId'
   id:
     | '__root__'
     | '/'
@@ -158,6 +182,8 @@ export interface FileRouteTypes {
     | '/batch/$batchId'
     | '/topics/$batchId/$subjectId'
     | '/chapter/$batchId/$subjectId/$chapterId'
+    | '/lecture/$batchId/$subjectId/$scheduleId'
+    | '/pdf/$batchId/$subjectId/$scheduleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,6 +198,8 @@ export interface RootRouteChildren {
   BatchBatchIdRoute: typeof BatchBatchIdRoute
   TopicsBatchIdSubjectIdRoute: typeof TopicsBatchIdSubjectIdRoute
   ChapterBatchIdSubjectIdChapterIdRoute: typeof ChapterBatchIdSubjectIdChapterIdRoute
+  LectureBatchIdSubjectIdScheduleIdRoute: typeof LectureBatchIdSubjectIdScheduleIdRoute
+  PdfBatchIdSubjectIdScheduleIdRoute: typeof PdfBatchIdSubjectIdScheduleIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -253,6 +281,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChapterBatchIdSubjectIdChapterIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lecture/$batchId/$subjectId/$scheduleId': {
+      id: '/lecture/$batchId/$subjectId/$scheduleId'
+      path: '/lecture/$batchId/$subjectId/$scheduleId'
+      fullPath: '/lecture/$batchId/$subjectId/$scheduleId'
+      preLoaderRoute: typeof LectureBatchIdSubjectIdScheduleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pdf/$batchId/$subjectId/$scheduleId': {
+      id: '/pdf/$batchId/$subjectId/$scheduleId'
+      path: '/pdf/$batchId/$subjectId/$scheduleId'
+      fullPath: '/pdf/$batchId/$subjectId/$scheduleId'
+      preLoaderRoute: typeof PdfBatchIdSubjectIdScheduleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -268,6 +310,9 @@ const rootRouteChildren: RootRouteChildren = {
   BatchBatchIdRoute: BatchBatchIdRoute,
   TopicsBatchIdSubjectIdRoute: TopicsBatchIdSubjectIdRoute,
   ChapterBatchIdSubjectIdChapterIdRoute: ChapterBatchIdSubjectIdChapterIdRoute,
+  LectureBatchIdSubjectIdScheduleIdRoute:
+    LectureBatchIdSubjectIdScheduleIdRoute,
+  PdfBatchIdSubjectIdScheduleIdRoute: PdfBatchIdSubjectIdScheduleIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
