@@ -7,6 +7,8 @@ import {
   ChevronDown,
   ChevronRight,
   ClipboardCheck,
+  Clock,
+
   CloudDownload,
   GraduationCap,
   ListChecks,
@@ -168,18 +170,57 @@ function StudyPage() {
           </button>
         </div>
         {schedule.data && schedule.data.length > 0 ? (
-          <div className="mt-4 space-y-2.5">
+          <div className="no-scrollbar -mx-4 mt-4 flex gap-3 overflow-x-auto px-4 pb-1">
             {schedule.data.map((c) => (
-              <div
+              <Link
                 key={c.id}
-                className="rounded-xl border border-border p-3 shadow-sm"
+                to="/lecture/$batchId/$subjectId/$scheduleId"
+                params={{
+                  batchId: batchId ?? "",
+                  subjectId: c.subjectId,
+                  scheduleId: c.id,
+                }}
+                className="w-[268px] shrink-0 overflow-hidden rounded-xl border border-border shadow-sm"
               >
-                <p className="text-[12px] font-bold text-foreground">{c.topic}</p>
-                <p className="mt-1 text-[11px] font-bold text-muted-foreground">
-                  {c.subject}
-                  {c.startTime ? ` • ${c.startTime} - ${c.endTime}` : ""}
+                <div className="relative h-[150px] bg-muted">
+                  {c.teacherImage ? (
+                    <img
+                      src={c.teacherImage}
+                      alt={c.teacher}
+                      loading="lazy"
+                      className="size-full object-cover"
+                    />
+                  ) : null}
+                  <span className="absolute inset-x-0 bottom-0 block bg-[#111] py-2 text-center text-[13px] font-bold text-white">
+                    {c.teacher || c.subject}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2.5">
+                  <span
+                    className={
+                      c.status === "LIVE"
+                        ? "rounded-md bg-[#e23b3b] px-2.5 py-1 text-[11px] font-bold text-white"
+                        : c.status === "COMPLETED"
+                          ? "rounded-md bg-[#1a9d4b] px-2.5 py-1 text-[11px] font-bold text-white"
+                          : "rounded-md bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground"
+                    }
+                  >
+                    {c.status}
+                  </span>
+                  <span className="flex items-center gap-1 text-[12px] font-bold text-muted-foreground">
+                    <Clock className="size-3.5" />
+                    {c.startTime
+                      ? new Date(c.startTime).toLocaleTimeString("en-IN", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "--"}
+                  </span>
+                </div>
+                <p className="truncate border-t border-border px-3 py-2.5 text-[12px] font-bold text-foreground">
+                  {c.topic}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
@@ -189,6 +230,7 @@ function StudyPage() {
             </p>
           </div>
         )}
+
         {batchId ? (
           <Link
             to="/batch/$batchId"

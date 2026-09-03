@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -106,8 +106,15 @@ function ChapterPage() {
 
         {tab !== "DPP Quiz" &&
           contents.data?.map((c) => (
-            <article
+            <Link
               key={c.id}
+              to={
+                c.kind === "video"
+                  ? "/lecture/$batchId/$subjectId/$scheduleId"
+                  : "/pdf/$batchId/$subjectId/$scheduleId"
+              }
+              params={{ batchId, subjectId, scheduleId: c.scheduleId }}
+              {...(c.kind === "video" ? {} : { search: { hw: c.id } })}
               className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5"
             >
               {c.kind === "video" ? (
@@ -143,7 +150,7 @@ function ChapterPage() {
                 </span>
               </span>
               <ChevronRight className="size-4 text-muted-foreground" />
-            </article>
+            </Link>
           ))}
 
         {tab === "DPP Quiz" &&
@@ -154,11 +161,16 @@ function ChapterPage() {
                 <ClipboardList className="size-3.5" /> {q.totalQuestions} Questions |{" "}
                 {q.totalMarks} Marks | {q.maxDuration} Mins
               </p>
-              <button className="mt-2.5 w-full rounded-xl bg-primary py-2.5 text-[12px] font-bold text-primary-foreground">
+              <Link
+                to="/quiz/$testId"
+                params={{ testId: q.id }}
+                className="mt-2.5 block w-full rounded-xl bg-primary py-2.5 text-center text-[12px] font-bold text-primary-foreground"
+              >
                 Start Quiz
-              </button>
+              </Link>
             </article>
           ))}
+
 
         {!loading &&
           (tab === "DPP Quiz" ? quizzes.data?.length === 0 : contents.data?.length === 0) && (

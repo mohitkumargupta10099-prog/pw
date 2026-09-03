@@ -77,14 +77,42 @@ export const todaysSchedule = createServerFn({ method: "GET" })
     return list.map((item) => {
       const x = (item as Record<string, unknown>)["data"] as Record<string, unknown>;
       const subj = x?.["subjectId"] as Record<string, string> | undefined;
+      const teacher = x?.["teacherId"] as Record<string, unknown> | undefined;
+      const timeline = x?.["timeline"] as Record<string, unknown> | undefined;
+      const img = teacher?.["imageId"] as Record<string, string> | undefined;
+      const start = String(x?.["startTime"] ?? "");
+      const end = String(x?.["endTime"] ?? "");
+      const raw = String(
+        x?.["status"] ?? timeline?.["status"] ?? x?.["scheduleStatus"] ?? "",
+      ).toUpperCase();
+      const now = Date.now();
+      const st = Date.parse(start);
+      const en = Date.parse(end);
+      let status: "LIVE" | "UPCOMING" | "COMPLETED" =
+        raw.includes("LIVE") || raw === "ONGOING"
+          ? "LIVE"
+          : raw.includes("COMPLET") || raw === "ENDED"
+            ? "COMPLETED"
+            : "UPCOMING";
+      if (!raw && !Number.isNaN(st)) {
+        status = now < st ? "UPCOMING" : !Number.isNaN(en) && now > en ? "COMPLETED" : "LIVE";
+      }
       return {
         id: String(x?.["_id"] ?? Math.random()),
+        subjectId: String(subj?.["_id"] ?? ""),
         topic: String(x?.["topic"] ?? "Class"),
         subject: subj?.["name"] ?? "",
-        startTime: String(x?.["startTime"] ?? ""),
-        endTime: String(x?.["endTime"] ?? ""),
+        teacher: String(
+          `${teacher?.["firstName"] ?? ""} ${teacher?.["lastName"] ?? ""}`.trim(),
+        ),
+        teacherImage:
+          img?.["baseUrl"] && img?.["key"] ? `${img["baseUrl"]}${img["key"]}` : "",
+        startTime: start,
+        endTime: end,
+        status,
       };
     });
+
   });
 
 export const batchTests = createServerFn({ method: "GET" })
