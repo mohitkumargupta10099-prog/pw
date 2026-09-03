@@ -18,6 +18,7 @@ import { Route as PiRouteImport } from './routes/pi'
 import { Route as SelectGoalRouteImport } from './routes/select-goal'
 import { Route as StoreRouteImport } from './routes/store'
 import { Route as BatchBatchIdRouteImport } from './routes/batch.$batchId'
+import { Route as QuizTestIdRouteImport } from './routes/quiz.$testId'
 import { Route as TopicsBatchIdSubjectIdRouteImport } from './routes/topics.$batchId.$subjectId'
 import { Route as ChapterBatchIdSubjectIdChapterIdRouteImport } from './routes/chapter.$batchId.$subjectId.$chapterId'
 import { Route as LectureBatchIdSubjectIdScheduleIdRouteImport } from './routes/lecture.$batchId.$subjectId.$scheduleId'
@@ -68,6 +69,11 @@ const BatchBatchIdRoute = BatchBatchIdRouteImport.update({
   path: '/batch/$batchId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizTestIdRoute = QuizTestIdRouteImport.update({
+  id: '/quiz/$testId',
+  path: '/quiz/$testId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TopicsBatchIdSubjectIdRoute = TopicsBatchIdSubjectIdRouteImport.update({
   id: '/topics/$batchId/$subjectId',
   path: '/topics/$batchId/$subjectId',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/select-goal': typeof SelectGoalRoute
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
+  '/quiz/$testId': typeof QuizTestIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
   '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
   '/lecture/$batchId/$subjectId/$scheduleId': typeof LectureBatchIdSubjectIdScheduleIdRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/select-goal': typeof SelectGoalRoute
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
+  '/quiz/$testId': typeof QuizTestIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
   '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
   '/lecture/$batchId/$subjectId/$scheduleId': typeof LectureBatchIdSubjectIdScheduleIdRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/select-goal': typeof SelectGoalRoute
   '/store': typeof StoreRoute
   '/batch/$batchId': typeof BatchBatchIdRoute
+  '/quiz/$testId': typeof QuizTestIdRoute
   '/topics/$batchId/$subjectId': typeof TopicsBatchIdSubjectIdRoute
   '/chapter/$batchId/$subjectId/$chapterId': typeof ChapterBatchIdSubjectIdChapterIdRoute
   '/lecture/$batchId/$subjectId/$scheduleId': typeof LectureBatchIdSubjectIdScheduleIdRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/select-goal'
     | '/store'
     | '/batch/$batchId'
+    | '/quiz/$testId'
     | '/topics/$batchId/$subjectId'
     | '/chapter/$batchId/$subjectId/$chapterId'
     | '/lecture/$batchId/$subjectId/$scheduleId'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/select-goal'
     | '/store'
     | '/batch/$batchId'
+    | '/quiz/$testId'
     | '/topics/$batchId/$subjectId'
     | '/chapter/$batchId/$subjectId/$chapterId'
     | '/lecture/$batchId/$subjectId/$scheduleId'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/select-goal'
     | '/store'
     | '/batch/$batchId'
+    | '/quiz/$testId'
     | '/topics/$batchId/$subjectId'
     | '/chapter/$batchId/$subjectId/$chapterId'
     | '/lecture/$batchId/$subjectId/$scheduleId'
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   SelectGoalRoute: typeof SelectGoalRoute
   StoreRoute: typeof StoreRoute
   BatchBatchIdRoute: typeof BatchBatchIdRoute
+  QuizTestIdRoute: typeof QuizTestIdRoute
   TopicsBatchIdSubjectIdRoute: typeof TopicsBatchIdSubjectIdRoute
   ChapterBatchIdSubjectIdChapterIdRoute: typeof ChapterBatchIdSubjectIdChapterIdRoute
   LectureBatchIdSubjectIdScheduleIdRoute: typeof LectureBatchIdSubjectIdScheduleIdRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BatchBatchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz/$testId': {
+      id: '/quiz/$testId'
+      path: '/quiz/$testId'
+      fullPath: '/quiz/$testId'
+      preLoaderRoute: typeof QuizTestIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/topics/$batchId/$subjectId': {
       id: '/topics/$batchId/$subjectId'
       path: '/topics/$batchId/$subjectId'
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   SelectGoalRoute: SelectGoalRoute,
   StoreRoute: StoreRoute,
   BatchBatchIdRoute: BatchBatchIdRoute,
+  QuizTestIdRoute: QuizTestIdRoute,
   TopicsBatchIdSubjectIdRoute: TopicsBatchIdSubjectIdRoute,
   ChapterBatchIdSubjectIdChapterIdRoute: ChapterBatchIdSubjectIdChapterIdRoute,
   LectureBatchIdSubjectIdScheduleIdRoute:
