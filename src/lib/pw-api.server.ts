@@ -37,15 +37,53 @@ export const CATEGORY_MATCHERS: Record<string, RegExp> = {
   UPSC: /upsc|ias|civil services/i,
 };
 
-export async function apiGet<T>(path: string): Promise<T | null> {
+const PRIMARY = "https://proxy.streamvideo.co.in/fetch/api.penpencil.co";
+const FALLBACK = "https://vidcloud.eu.org/api";
+const TOKEN_URL = "https://vidcloud.eu.org/generate_token.php";
+
+let token: string | null = null;
+let tokenAt = 0;
+
+async function getToken(force = false): Promise<string | null> {
+  if (!force && token && Date.now() - tokenAt < 1000 * 60 * 20) return token;
   try {
-    const res = await fetch(`${BASE}${path}`, {
-      headers: { accept: "application/json" },
-    });
+    const res = await fetch(TOKEN_URL, { headers: { accept: "application/json" } });
+    const json = (await res.json()) as { access_token?: string };
+    token = json.access_token ?? null;
+    tokenAt = Date.now();
+  } catch {
+    token = null;
+  }
+  return token;
+}
+
+async function tryFetch<T>(url: string, headers: Record<string, string>): Promise<T | null> {
+  try {
+    const res = await fetch(url, { headers: { accept: "application/json", ...headers } });
     if (!res.ok) return null;
-    const json = (await res.json()) as { data?: T };
+    const json = (await res.json()) as { data?: T; success?: boolean };
+    if (json.success === false) return null;
     return (json.data ?? null) as T | null;
   } catch {
     return null;
   }
 }
+
+/** Primary API -> current base -> fallback API (with token) -> retry with fresh token. */
+export async function apiGet<T>(path: string): Promise<T | null> {
+  for (const base of [PRIMARY, BASE]) {
+    const out = await tryFetch<T>(`${base}${path}`, {});
+    if (out !== null) return out;
+  }
+  for (const force of [false, true]) {
+    const t = await getToken(force);
+    if (!t) continue;
+    const out = await tryFetch<T>(`${FALLBACK}${path}`, {
+      authorization: `Bearer ${t}`,
+      "x-access-token": t,
+    });
+    if (out !== null) return out;
+  }
+  return null;
+}
+
