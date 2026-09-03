@@ -166,11 +166,16 @@ export const communityPosts = createServerFn({ method: "GET" })
     const first = channels[0] as Record<string, unknown> | undefined;
     if (!first) return { channel: "", posts: [] };
     const channelId = String(first["_id"]);
-    const res =
-      (await apiGet<{ posts?: unknown[] }>(
-        `/v3/community/posts/v2?channelId=${channelId}&page=1&timestamp=${Math.floor(Date.now() / 1000)}`,
-      )) ?? {};
-    const posts = Array.isArray(res) ? (res as unknown[]) : (res.posts ?? []);
+    const posts: unknown[] = [];
+    for (let page = 1; page <= 4; page++) {
+      const res =
+        (await apiGet<{ posts?: unknown[] }>(
+          `/v3/community/posts/v2?channelId=${channelId}&page=${page}&timestamp=${Math.floor(Date.now() / 1000)}`,
+        )) ?? {};
+      const chunk = Array.isArray(res) ? (res as unknown[]) : (res.posts ?? []);
+      if (chunk.length === 0) break;
+      posts.push(...chunk);
+    }
     const clean = (s: string) => {
       let t = s;
       try {
@@ -180,9 +185,17 @@ export const communityPosts = createServerFn({ method: "GET" })
       }
       return t.replace(/<[^>]*>/g, "").trim();
     };
+    const seen = new Set<string>();
     return {
       channel: String(first["name"] ?? "Student Discussion Channel"),
-      posts: posts.slice(0, 20).map((p) => {
+      posts: posts
+        .filter((p) => {
+          const id = String((p as Record<string, unknown>)["_id"]);
+          if (seen.has(id)) return false;
+          seen.add(id);
+          return true;
+        })
+        .map((p) => {
         const x = p as Record<string, unknown>;
         const user = (x["user"] ?? x["userId"]) as Record<string, unknown> | undefined;
         const name =
