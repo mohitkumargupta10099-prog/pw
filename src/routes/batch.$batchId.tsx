@@ -40,7 +40,7 @@ export const Route = createFileRoute("/batch/$batchId")({
   component: BatchPage,
 });
 
-const tabs = ["Description", "Subjects", "Resources", "Tests", "Community"] as const;
+const tabs = ["Announcement", "Subjects", "Resources", "Tests", "Community"] as const;
 type Tab = (typeof tabs)[number];
 
 const subjectColors: Record<string, string> = {};
@@ -71,7 +71,7 @@ function BatchPage() {
   const announcements = useQuery({
     queryKey: ["batch-ann", batchId],
     queryFn: () => getAnnouncements({ data: { batchId } }),
-    enabled: tab === "Description",
+    enabled: tab === "Announcement",
   });
   const community = useQuery({
     queryKey: ["batch-community", batchId],
@@ -151,7 +151,7 @@ function BatchPage() {
         </div>
       )}
 
-      {tab === "Description" && (
+      {tab === "Announcement" && (
         <div className="space-y-2.5 px-3 py-3">
           <div className="rounded-xl border border-border bg-card p-3">
             <p className="text-[13px] font-bold text-foreground">
