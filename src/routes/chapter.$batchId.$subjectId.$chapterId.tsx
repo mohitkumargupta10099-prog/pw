@@ -6,10 +6,12 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Download,
   FileText,
   PlayCircle,
 } from "lucide-react";
-import { chapterContents, chapterDpp } from "@/lib/pw-api.functions";
+import { chapterContents, chapterDpp, scheduleDetails } from "@/lib/pw-api.functions";
+import { downloadFile } from "@/lib/download";
 
 export const Route = createFileRoute("/chapter/$batchId/$subjectId/$chapterId")({
   head: () => ({
@@ -48,6 +50,22 @@ function ChapterPage() {
   const [tab, setTab] = useState<Tab>("Lectures");
   const getContents = useServerFn(chapterContents);
   const getDpp = useServerFn(chapterDpp);
+  const getSchedule = useServerFn(scheduleDetails);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  async function grabPdf(scheduleId: string, homeworkId: string, title: string) {
+    if (!scheduleId) return;
+    setBusyId(homeworkId);
+    try {
+      const d = await getSchedule({ data: { batchId, subjectId, scheduleId } });
+      const notes = d?.notes ?? [];
+      const note =
+        notes.find((n) => n.id === homeworkId || n.homeworkId === homeworkId) ?? notes[0];
+      if (note?.url) await downloadFile(note.url, note.name || title);
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   const contents = useQuery({
     queryKey: ["contents", batchId, subjectId, chapterId, tab],
@@ -105,20 +123,15 @@ function ChapterPage() {
           ))}
 
         {tab !== "DPP Quiz" &&
-          contents.data?.map((c) => (
-            <Link
-              key={c.id}
-              to={
-                c.kind === "video"
-                  ? "/lecture/$batchId/$subjectId/$scheduleId"
-                  : "/pdf/$batchId/$subjectId/$scheduleId"
-              }
-              params={{ batchId, subjectId, scheduleId: c.scheduleId }}
-              {...(c.kind === "video" ? {} : { search: { hw: c.id } })}
-              className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5"
-            >
-              {c.kind === "video" ? (
-                c.image ? (
+          contents.data?.map((c) =>
+            c.kind === "video" ? (
+              <Link
+                key={c.id}
+                to="/lecture/$batchId/$subjectId/$scheduleId"
+                params={{ batchId, subjectId, scheduleId: c.scheduleId }}
+                className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5"
+              >
+                {c.image ? (
                   <img
                     src={c.image}
                     alt={c.title}
@@ -129,29 +142,53 @@ function ChapterPage() {
                   <span className="flex h-14 w-24 shrink-0 items-center justify-center rounded-lg bg-secondary">
                     <PlayCircle className="size-6 text-primary" />
                   </span>
-                )
-              ) : (
+                )}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-bold text-foreground">
+                    {c.title}
+                  </span>
+                  <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
+                    {c.subtitle}
+                    {c.date
+                      ? ` • ${new Date(c.date).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                        })}`
+                      : ""}
+                  </span>
+                </span>
+                <ChevronRight className="size-4 text-muted-foreground" />
+              </Link>
+            ) : (
+              <button
+                key={c.id}
+                type="button"
+                disabled={busyId === c.id}
+                onClick={() => void grabPdf(c.scheduleId, c.id, c.title)}
+                className="flex w-full items-center gap-3 rounded-xl border border-border bg-card p-2.5 text-left disabled:opacity-60"
+              >
                 <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-secondary">
                   <FileText className="size-5 text-primary" />
                 </span>
-              )}
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-bold text-foreground">
-                  {c.title}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-bold text-foreground">
+                    {c.title}
+                  </span>
+                  <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
+                    {busyId === c.id ? "Downloading..." : c.subtitle}
+                    {c.date
+                      ? ` • ${new Date(c.date).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                        })}`
+                      : ""}
+                  </span>
                 </span>
-                <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
-                  {c.subtitle}
-                  {c.date
-                    ? ` • ${new Date(c.date).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                      })}`
-                    : ""}
-                </span>
-              </span>
-              <ChevronRight className="size-4 text-muted-foreground" />
-            </Link>
-          ))}
+                <Download className="size-4 text-primary" />
+              </button>
+            ),
+          )}
+
 
         {tab === "DPP Quiz" &&
           quizzes.data?.map((q) => (

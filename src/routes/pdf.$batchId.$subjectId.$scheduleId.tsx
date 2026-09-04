@@ -1,8 +1,10 @@
+import { useEffect, useRef } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft, Download, FileText } from "lucide-react";
 import { scheduleDetails } from "@/lib/pw-api.functions";
+import { downloadFile } from "@/lib/download";
 
 export const Route = createFileRoute("/pdf/$batchId/$subjectId/$scheduleId")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -37,6 +39,14 @@ function PdfPage() {
   const notes = q.data?.notes ?? [];
   const note = (hw ? notes.find((n) => n.homeworkId === hw || n.id === hw) : notes[0]) ?? notes[0];
 
+  const done = useRef(false);
+  useEffect(() => {
+    if (note?.url && !done.current) {
+      done.current = true;
+      void downloadFile(note.url, note.name || note.title);
+    }
+  }, [note]);
+
   return (
     <div className="mx-auto flex min-h-screen max-w-screen-sm flex-col bg-muted">
       <header className="sticky top-0 z-20 flex items-center gap-2 bg-card px-3 py-2.5">
@@ -67,8 +77,12 @@ function PdfPage() {
             target="_blank"
             rel="noreferrer"
             className="m-3 rounded-xl bg-primary py-2.5 text-center text-[12px] font-bold text-primary-foreground"
+            onClick={(e) => {
+              e.preventDefault();
+              void downloadFile(note.url, note.name || note.title);
+            }}
           >
-            Open PDF in new tab
+            Download PDF
           </a>
         </>
       )}
