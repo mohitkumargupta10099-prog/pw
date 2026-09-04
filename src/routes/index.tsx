@@ -180,9 +180,9 @@ function StudyPage() {
                   subjectId: c.subjectId,
                   scheduleId: c.id,
                 }}
-                className="w-[268px] shrink-0 overflow-hidden rounded-xl border border-border shadow-sm"
+                className="w-[190px] shrink-0 overflow-hidden rounded-xl border border-border shadow-sm"
               >
-                <div className="relative h-[150px] bg-muted">
+                <div className="relative h-[104px] bg-muted">
                   {c.teacherImage ? (
                     <img
                       src={c.teacherImage}
@@ -191,24 +191,24 @@ function StudyPage() {
                       className="size-full object-cover"
                     />
                   ) : null}
-                  <span className="absolute inset-x-0 bottom-0 block bg-[#111] py-2 text-center text-[13px] font-bold text-white">
+                  <span className="absolute inset-x-0 bottom-0 block bg-[#111] py-1.5 text-center text-[11px] font-bold text-white">
                     {c.teacher || c.subject}
                   </span>
                 </div>
-                <div className="flex items-center justify-between px-3 py-2.5">
+                <div className="flex items-center justify-between px-2.5 py-2">
                   <span
                     className={
                       c.status === "LIVE"
-                        ? "rounded-md bg-[#e23b3b] px-2.5 py-1 text-[11px] font-bold text-white"
+                        ? "rounded-md bg-[#e23b3b] px-2 py-0.5 text-[10px] font-bold text-white"
                         : c.status === "COMPLETED"
-                          ? "rounded-md bg-[#1a9d4b] px-2.5 py-1 text-[11px] font-bold text-white"
-                          : "rounded-md bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground"
+                          ? "rounded-md bg-[#1a9d4b] px-2 py-0.5 text-[10px] font-bold text-white"
+                          : "rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground"
                     }
                   >
                     {c.status}
                   </span>
-                  <span className="flex items-center gap-1 text-[12px] font-bold text-muted-foreground">
-                    <Clock className="size-3.5" />
+                  <span className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground">
+                    <Clock className="size-3" />
                     {c.startTime
                       ? new Date(c.startTime).toLocaleTimeString("en-IN", {
                           hour: "2-digit",
@@ -217,7 +217,7 @@ function StudyPage() {
                       : "--"}
                   </span>
                 </div>
-                <p className="truncate border-t border-border px-3 py-2.5 text-[12px] font-bold text-foreground">
+                <p className="truncate border-t border-border px-2.5 py-2 text-[11px] font-bold text-foreground">
                   {c.topic}
                 </p>
               </Link>
