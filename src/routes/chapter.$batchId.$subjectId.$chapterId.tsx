@@ -6,10 +6,12 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
+  Download,
   FileText,
   PlayCircle,
 } from "lucide-react";
-import { chapterContents, chapterDpp } from "@/lib/pw-api.functions";
+import { chapterContents, chapterDpp, scheduleDetails } from "@/lib/pw-api.functions";
+import { downloadFile } from "@/lib/download";
 
 export const Route = createFileRoute("/chapter/$batchId/$subjectId/$chapterId")({
   head: () => ({
@@ -48,6 +50,22 @@ function ChapterPage() {
   const [tab, setTab] = useState<Tab>("Lectures");
   const getContents = useServerFn(chapterContents);
   const getDpp = useServerFn(chapterDpp);
+  const getSchedule = useServerFn(scheduleDetails);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  async function grabPdf(scheduleId: string, homeworkId: string, title: string) {
+    if (!scheduleId) return;
+    setBusyId(homeworkId);
+    try {
+      const d = await getSchedule({ data: { batchId, subjectId, scheduleId } });
+      const notes = d?.notes ?? [];
+      const note =
+        notes.find((n) => n.id === homeworkId || n.homeworkId === homeworkId) ?? notes[0];
+      if (note?.url) await downloadFile(note.url, note.name || title);
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   const contents = useQuery({
     queryKey: ["contents", batchId, subjectId, chapterId, tab],
