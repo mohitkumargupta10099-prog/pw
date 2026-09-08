@@ -4,14 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronLeft,
-  ChevronRight,
   ClipboardList,
+  Copy,
   Download,
   FileText,
+  MoreVertical,
   PlayCircle,
+  X,
 } from "lucide-react";
-import { chapterContents, chapterDpp, scheduleDetails } from "@/lib/pw-api.functions";
+import { chapterContents, chapterDpp, scheduleDetails, subjectTopics } from "@/lib/pw-api.functions";
 import { downloadFile } from "@/lib/download";
+import lectureFallback from "@/assets/lecture-fallback.jpg";
 
 export const Route = createFileRoute("/chapter/$batchId/$subjectId/$chapterId")({
   head: () => ({
@@ -31,7 +34,7 @@ export const Route = createFileRoute("/chapter/$batchId/$subjectId/$chapterId")(
   component: ChapterPage,
 });
 
-const tabs = ["Lectures", "Notes", "DPP", "DPP Videos", "DPP Quiz"] as const;
+const tabs = ["Lectures", "Notes", "DPP", "DPP PDF", "DPP Quiz"] as const;
 type Tab = (typeof tabs)[number];
 
 const contentTypeOf: Record<
@@ -41,7 +44,7 @@ const contentTypeOf: Record<
   Lectures: "LECTURES",
   Notes: "NOTES",
   DPP: "DPP_PDF",
-  "DPP Videos": "DPP_VIDEOS",
+  "DPP PDF": "DPP_VIDEOS",
 };
 
 function ChapterPage() {
@@ -51,6 +54,7 @@ function ChapterPage() {
   const getContents = useServerFn(chapterContents);
   const getDpp = useServerFn(chapterDpp);
   const getSchedule = useServerFn(scheduleDetails);
+  const getTopics = useServerFn(subjectTopics);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function grabPdf(scheduleId: string, homeworkId: string, title: string) {
@@ -89,25 +93,32 @@ function ChapterPage() {
   });
 
   const loading = tab === "DPP Quiz" ? quizzes.isPending : contents.isPending;
+  const topics = useQuery({
+    queryKey: ["topics", batchId, subjectId],
+    queryFn: () => getTopics({ data: { batchId, subjectId } }),
+    staleTime: 10 * 60_000,
+  });
+  const chapterName = topics.data?.find((topic) => topic.id === chapterId)?.name ?? "Chapter";
 
   return (
-    <div className="mx-auto min-h-screen max-w-screen-sm bg-muted pb-10">
+    <div className="mx-auto min-h-screen max-w-screen-sm bg-background pb-10">
       <header className="sticky top-0 z-20 bg-card">
-        <div className="flex items-center gap-2 px-3 py-2.5">
+        <div className="grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-5">
           <button aria-label="Back" onClick={() => router.history.back()}>
-            <ChevronLeft className="size-5 text-foreground" strokeWidth={2.4} />
+            <ChevronLeft className="size-6 text-foreground" strokeWidth={2.6} />
           </button>
-          <h1 className="flex-1 text-[14px] font-bold text-foreground">Chapter</h1>
+          <h1 className="truncate text-[16px] font-extrabold text-foreground">{chapterName}</h1>
+          <span className="w-6" />
         </div>
-        <div className="no-scrollbar flex gap-5 overflow-x-auto border-b border-border px-3">
+        <div className="no-scrollbar grid auto-cols-[minmax(5rem,1fr)] grid-flow-col overflow-x-auto border-b border-border px-2">
           {tabs.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={
                 t === tab
-                  ? "shrink-0 border-b-[3px] border-primary pb-2 text-[13px] font-bold text-primary"
-                  : "shrink-0 border-b-[3px] border-transparent pb-2 text-[13px] font-bold text-foreground"
+                  ? "shrink-0 border-b-[4px] border-primary px-2 pb-3 pt-2 text-[12px] font-extrabold text-primary"
+                  : "shrink-0 border-b-[4px] border-transparent px-2 pb-3 pt-2 text-[12px] font-bold text-muted-foreground"
               }
             >
               {t}
@@ -116,7 +127,16 @@ function ChapterPage() {
         </div>
       </header>
 
-      <div className="space-y-2.5 px-3 py-3">
+      {tab === "Lectures" && (
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-secondary px-4 py-2">
+          <p className="truncate text-[11px] font-semibold text-foreground">
+            Earn 2 XP for every minute you watch a lecture.
+          </p>
+          <X className="size-4 text-foreground" />
+        </div>
+      )}
+
+      <div className="space-y-3 px-4 py-3">
         {loading &&
           [0, 1, 2].map((i) => (
             <div key={i} className="h-20 animate-pulse rounded-xl bg-card" />
@@ -129,25 +149,24 @@ function ChapterPage() {
                 key={c.id}
                 to="/lecture/$batchId/$subjectId/$scheduleId"
                 params={{ batchId, subjectId, scheduleId: c.scheduleId }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5"
+                className="grid min-h-[78px] grid-cols-[7rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-lg border border-border bg-card p-1.5 shadow-sm"
               >
-                {c.image ? (
+                <span className="relative block overflow-hidden rounded-md bg-secondary">
                   <img
-                    src={c.image}
+                    src={c.image || lectureFallback}
                     alt={c.title}
                     loading="lazy"
-                    className="h-14 w-24 shrink-0 rounded-lg object-cover"
+                    width={1024}
+                    height={576}
+                    className="aspect-video w-full object-cover"
                   />
-                ) : (
-                  <span className="flex h-14 w-24 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                    <PlayCircle className="size-6 text-primary" />
-                  </span>
-                )}
+                  <PlayCircle className="absolute bottom-1 right-1 size-5 fill-primary text-primary-foreground" />
+                </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13px] font-bold text-foreground">
+                  <span className="line-clamp-2 text-[12px] font-extrabold leading-4 text-foreground">
                     {c.title}
                   </span>
-                  <span className="mt-0.5 block truncate text-[11px] font-bold text-muted-foreground">
+                  <span className="mt-2 block truncate text-[10px] font-semibold text-muted-foreground">
                     {c.subtitle}
                     {c.date
                       ? ` • ${new Date(c.date).toLocaleDateString("en-IN", {
@@ -157,7 +176,13 @@ function ChapterPage() {
                       : ""}
                   </span>
                 </span>
-                <ChevronRight className="size-4 text-muted-foreground" />
+                <span className="flex h-full flex-col items-center justify-between py-1">
+                  <MoreVertical className="size-4 text-foreground" />
+                  <span className="flex items-center gap-2">
+                    <Copy className="size-4 text-foreground" />
+                    <Download className="size-4 text-foreground" />
+                  </span>
+                </span>
               </Link>
             ) : (
               <button

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Bell,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -44,9 +45,6 @@ const tabs = ["Announcement", "Subjects", "Resources", "Tests", "Community"] as 
 type Tab = (typeof tabs)[number];
 
 const subjectColors: Record<string, string> = {};
-function shortOf(name: string) {
-  return name.slice(0, 2);
-}
 
 function BatchPage() {
   const { batchId } = Route.useParams();
@@ -115,36 +113,33 @@ function BatchPage() {
       </header>
 
       {tab === "Subjects" && (
-        <div className="px-3 py-3">
-          <div className="rounded-lg bg-[#fdf6e6] px-3 py-2.5 text-[11px] font-bold text-foreground">
-            Completion % depends on lecture and DPP progress!
-          </div>
-          <div className="mt-3 space-y-2.5">
+        <div className="bg-background px-4 py-5">
+          <div className="space-y-4">
             {details.isPending &&
               [0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-16 animate-pulse rounded-xl bg-card" />
+                <div key={i} className="h-16 animate-pulse rounded-lg bg-muted" />
               ))}
             {details.data?.subjects.map((s) => (
               <Link
                 key={s.id}
                 to="/topics/$batchId/$subjectId"
                 params={{ batchId, subjectId: s.id }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5"
+                className="grid min-h-16 grid-cols-[4.5rem_minmax(0,1fr)_auto] items-stretch overflow-hidden rounded-lg border border-border bg-card shadow-sm"
               >
-                <span
-                  className="flex size-11 items-center justify-center rounded-xl bg-secondary text-[13px] font-bold text-primary"
-                  style={{ color: subjectColors[s.name] }}
-                >
-                  {shortOf(s.name)}
+                <span className="flex items-center justify-center bg-secondary">
+                  {s.image ? (
+                    <img src={s.image} alt="" loading="lazy" className="size-10 object-contain" />
+                  ) : (
+                    <BookOpen className="size-8 text-primary" strokeWidth={1.7} />
+                  )}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-foreground">
-                  {s.name}
+                <span className="flex min-w-0 flex-col justify-center px-3 py-2.5">
+                  <span className="truncate text-[14px] font-extrabold text-foreground">{s.name}</span>
+                  <span className="mt-0.5 text-[11px] font-bold text-muted-foreground">
+                    {s.tagCount || 0} Chapters
+                  </span>
                 </span>
-                <span className="text-right">
-                  <span className="block text-[11px] font-bold text-foreground">0%</span>
-                  <span className="mt-1 block h-1.5 w-14 rounded-full bg-muted" />
-                </span>
-                <ChevronRight className="size-4 text-muted-foreground" />
+                <ChevronRight className="mr-3 size-4 self-center text-muted-foreground" />
               </Link>
             ))}
           </div>
