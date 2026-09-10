@@ -7,7 +7,6 @@ import {
   ClipboardList,
   Clock,
   FileText,
-  Maximize2,
 } from "lucide-react";
 import { batchDetails, scheduleDetails } from "@/lib/pw-api.functions";
 
