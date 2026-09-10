@@ -151,6 +151,7 @@ function ChapterPage() {
                 key={c.id}
                 to="/lecture/$batchId/$subjectId/$scheduleId"
                 params={{ batchId, subjectId, scheduleId: c.scheduleId }}
+                search={{ topic: topicSlug }}
                 className="grid min-h-[78px] grid-cols-[7rem_minmax(0,1fr)_auto] items-center gap-2.5 rounded-lg border border-border bg-card p-1.5 shadow-sm"
               >
                 <span className="relative block overflow-hidden rounded-md bg-secondary">
