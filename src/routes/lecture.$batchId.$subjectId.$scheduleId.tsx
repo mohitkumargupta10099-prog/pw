@@ -65,21 +65,21 @@ function LecturePage() {
 
   return (
     <div className="mx-auto min-h-dvh max-w-screen-sm bg-background">
-      <header className="sticky top-0 z-20 flex h-11 items-center gap-2 bg-background px-3">
-        <button aria-label="Back" onClick={() => router.history.back()}>
-          <ChevronLeft className="size-5 text-foreground" strokeWidth={2.6} />
-        </button>
-        <h1 className="flex-1 truncate text-[14px] font-extrabold text-foreground">
-          {d?.topic ?? "Lecture"}
-        </h1>
-      </header>
+      <div className="relative h-dvh w-full bg-black">
+        <header className="absolute left-0 right-0 top-0 z-30 flex h-11 items-center gap-2 bg-gradient-to-b from-black/70 to-transparent px-3">
+          <button aria-label="Back" onClick={() => router.history.back()}>
+            <ChevronLeft className="size-5 text-white drop-shadow" strokeWidth={2.6} />
+          </button>
+          <h1 className="flex-1 truncate text-[14px] font-extrabold text-white drop-shadow">
+            {d?.topic ?? "Lecture"}
+          </h1>
+        </header>
 
-      <div className="bg-black" style={{ height: "calc(100dvh - 44px)" }}>
         <iframe
           key={playerUrl}
           src={playerUrl}
           title={d?.topic ?? "Lecture player"}
-          className="size-full border-0"
+          className="absolute inset-0 size-full border-0"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowFullScreen
         />
@@ -109,14 +109,6 @@ function LecturePage() {
               </span>
             )}
           </p>
-          <a
-            href={playerUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2.5 flex items-center justify-center gap-1.5 rounded-xl bg-primary py-2 text-[11px] font-extrabold text-primary-foreground"
-          >
-            <Maximize2 className="size-3.5" /> Open Player in New Tab
-          </a>
         </div>
 
         {q.isPending && <div className="h-16 animate-pulse rounded-xl bg-card" />}
