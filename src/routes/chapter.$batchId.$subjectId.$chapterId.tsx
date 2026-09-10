@@ -98,7 +98,9 @@ function ChapterPage() {
     queryFn: () => getTopics({ data: { batchId, subjectId } }),
     staleTime: 10 * 60_000,
   });
-  const chapterName = topics.data?.find((topic) => topic.id === chapterId)?.name ?? "Chapter";
+  const currentTopic = topics.data?.find((topic) => topic.id === chapterId);
+  const chapterName = currentTopic?.name ?? "Chapter";
+  const topicSlug = currentTopic?.slug ?? chapterId;
 
   return (
     <div className="mx-auto min-h-screen max-w-screen-sm bg-background pb-10">
