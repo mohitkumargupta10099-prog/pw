@@ -64,27 +64,25 @@ function LecturePage() {
     `&isLocked=true&topicId=${encodeURIComponent(topic || "")}`;
 
   return (
-    <div className="mx-auto min-h-screen max-w-screen-sm bg-background pb-10">
-      <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-border bg-card px-3 py-2.5">
+    <div className="mx-auto min-h-dvh max-w-screen-sm bg-background">
+      <header className="sticky top-0 z-20 flex h-11 items-center gap-2 bg-background px-3">
         <button aria-label="Back" onClick={() => router.history.back()}>
           <ChevronLeft className="size-5 text-foreground" strokeWidth={2.6} />
         </button>
-        <h1 className="flex-1 truncate text-[13px] font-extrabold text-foreground">
+        <h1 className="flex-1 truncate text-[14px] font-extrabold text-foreground">
           {d?.topic ?? "Lecture"}
         </h1>
       </header>
 
-      <div className="bg-black">
-        <div className="relative aspect-video w-full">
-          <iframe
-            key={playerUrl}
-            src={playerUrl}
-            title={d?.topic ?? "Lecture player"}
-            className="absolute inset-0 size-full border-0"
-            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
+      <div className="bg-black" style={{ height: "calc(100dvh - 44px)" }}>
+        <iframe
+          key={playerUrl}
+          src={playerUrl}
+          title={d?.topic ?? "Lecture player"}
+          className="size-full border-0"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
       </div>
 
       <div className="space-y-3 px-3 py-3">
