@@ -14,7 +14,7 @@ import { batchDetails, scheduleDetails } from "@/lib/pw-api.functions";
 export const Route = createFileRoute("/lecture/$batchId/$subjectId/$scheduleId")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { topic?: string } => ({
+  ): { topic?: string | undefined } => ({
     topic: typeof search["topic"] === "string" ? (search["topic"] as string) : undefined,
   }),
   head: () => ({
