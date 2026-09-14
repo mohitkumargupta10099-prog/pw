@@ -227,16 +227,9 @@ export const subjectTopics = createServerFn({ method: "GET" })
       )) ?? [];
     return list.map((t) => {
       const x = t as Record<string, unknown>;
-      const id = String(x["_id"]);
-      const name = String(x["name"] ?? "");
-      const derived = `${name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")}-${id.slice(-6)}`;
       return {
-        id,
-        name,
-        slug: String(x["slug"] ?? derived),
+        id: String(x["_id"]),
+        name: String(x["name"] ?? ""),
         notes: Number(x["notes"] ?? 0),
         exercises: Number(x["exercises"] ?? 0),
         videos: Number(x["videos"] ?? 0),

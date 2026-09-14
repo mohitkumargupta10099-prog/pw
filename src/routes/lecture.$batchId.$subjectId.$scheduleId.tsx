@@ -5,17 +5,12 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardList,
-  Clock,
   FileText,
+  PlayCircle,
 } from "lucide-react";
-import { batchDetails, scheduleDetails } from "@/lib/pw-api.functions";
+import { scheduleDetails } from "@/lib/pw-api.functions";
 
 export const Route = createFileRoute("/lecture/$batchId/$subjectId/$scheduleId")({
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): { topic?: string | undefined } => ({
-    topic: typeof search["topic"] === "string" ? (search["topic"] as string) : undefined,
-  }),
   head: () => ({
     meta: [
       { title: "Lecture - PW Learn" },
@@ -35,131 +30,117 @@ export const Route = createFileRoute("/lecture/$batchId/$subjectId/$scheduleId")
 
 function LecturePage() {
   const { batchId, subjectId, scheduleId } = Route.useParams();
-  const { topic } = Route.useSearch();
   const router = useRouter();
   const getSchedule = useServerFn(scheduleDetails);
-  const getBatch = useServerFn(batchDetails);
 
   const q = useQuery({
     queryKey: ["schedule", batchId, subjectId, scheduleId],
     queryFn: () => getSchedule({ data: { batchId, subjectId, scheduleId } }),
     staleTime: 5 * 60_000,
   });
-  const batch = useQuery({
-    queryKey: ["batch", batchId],
-    queryFn: () => getBatch({ data: { batchId } }),
-    staleTime: 10 * 60_000,
-  });
   const d = q.data;
 
-  const subjectSlug =
-    batch.data?.subjects.find((s) => s.id === subjectId)?.slug ?? subjectId;
-
-  const playerUrl =
-    `https://www.learnxpw.site/watch?batchId=${encodeURIComponent(batchId)}` +
-    `&SubjectId=${encodeURIComponent(subjectSlug)}` +
-    `&ChildId=${encodeURIComponent(scheduleId)}` +
-    `&Type=penpencilvdo&VideoUrl=${encodeURIComponent(d?.videoUrl ?? "")}` +
-    `&isLocked=true&topicId=${encodeURIComponent(topic || "")}`;
-
   return (
-    <div className="mx-auto min-h-dvh max-w-screen-sm bg-background">
-      <div className="relative h-dvh w-full bg-black">
-        <header className="absolute left-0 right-0 top-0 z-30 flex h-11 items-center gap-2 bg-gradient-to-b from-black/70 to-transparent px-3">
-          <button aria-label="Back" onClick={() => router.history.back()}>
-            <ChevronLeft className="size-5 text-white drop-shadow" strokeWidth={2.6} />
-          </button>
-          <h1 className="flex-1 truncate text-[14px] font-extrabold text-white drop-shadow">
-            {d?.topic ?? "Lecture"}
-          </h1>
-        </header>
+    <div className="mx-auto min-h-screen max-w-screen-sm bg-muted pb-10">
+      <header className="sticky top-0 z-20 flex items-center gap-2 bg-card px-3 py-2.5">
+        <button aria-label="Back" onClick={() => router.history.back()}>
+          <ChevronLeft className="size-5 text-foreground" strokeWidth={2.4} />
+        </button>
+        <h1 className="flex-1 truncate text-[13px] font-bold text-foreground">
+          {d?.topic ?? "Lecture"}
+        </h1>
+      </header>
 
-        <iframe
-          key={playerUrl}
-          src={playerUrl}
-          title={d?.topic ?? "Lecture player"}
-          className="absolute inset-0 size-full border-0"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-          allowFullScreen
-        />
-      </div>
+      {q.isPending && <div className="m-3 h-44 animate-pulse rounded-xl bg-card" />}
 
-      <div className="space-y-3 px-3 py-3">
-        <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
-          <p className="text-[13px] font-extrabold leading-4 text-foreground">
-            {d?.topic ?? "Lecture"}
-          </p>
-          <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] font-bold text-muted-foreground">
-            <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-primary">
-              {d?.status || "Lecture"}
-            </span>
-            {d?.date && (
-              <span>
-                {new Date(d.date).toLocaleDateString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </span>
+      {d && (
+        <div className="space-y-3 px-3 py-3">
+          <div className="overflow-hidden rounded-xl bg-black">
+            {d.videoUrl ? (
+              <video src={d.videoUrl} controls poster={d.image} className="aspect-video w-full" />
+            ) : d.image ? (
+              <div className="relative">
+                <img src={d.image} alt={d.topic} className="aspect-video w-full object-cover" />
+                <span className="absolute inset-0 flex items-center justify-center bg-black/45">
+                  <PlayCircle className="size-10 text-white" />
+                </span>
+              </div>
+            ) : (
+              <div className="flex aspect-video w-full items-center justify-center">
+                <PlayCircle className="size-10 text-white/80" />
+              </div>
             )}
-            {d?.duration && (
-              <span className="flex items-center gap-1">
-                <Clock className="size-3" /> {d.duration}
-              </span>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-3">
+            <p className="text-[13px] font-bold text-foreground">{d.topic}</p>
+            <p className="mt-1 text-[11px] font-bold text-muted-foreground">
+              {d.status || "Lecture"}
+              {d.date
+                ? ` • ${new Date(d.date).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}`
+                : ""}
+              {d.duration ? ` • ${d.duration}` : ""}
+            </p>
+            {!d.videoUrl && (
+              <p className="mt-2 rounded-lg bg-secondary px-2.5 py-2 text-[11px] font-bold text-primary">
+                Video stream is not available for this lecture right now.
+              </p>
             )}
-          </p>
+          </div>
+
+          {d.notes.length > 0 && (
+            <>
+              <p className="px-1 text-[12px] font-bold text-foreground">Notes</p>
+              {d.notes.map((n) => (
+                <Link
+                  key={n.id}
+                  to="/pdf/$batchId/$subjectId/$scheduleId"
+                  params={{ batchId, subjectId, scheduleId }}
+                  search={{ hw: n.homeworkId }}
+                  className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5"
+                >
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary">
+                    <FileText className="size-5 text-primary" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13px] font-bold text-foreground">
+                      {n.title}
+                    </span>
+                    <span className="block truncate text-[11px] font-bold text-muted-foreground">
+                      {n.name}
+                    </span>
+                  </span>
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </Link>
+              ))}
+            </>
+          )}
+
+          {d.quizzes.length > 0 && (
+            <>
+              <p className="px-1 text-[12px] font-bold text-foreground">DPP Quiz</p>
+              {d.quizzes.map((qz) => (
+                <Link
+                  key={qz.id}
+                  to="/quiz/$testId"
+                  params={{ testId: qz.id }}
+                  className="block rounded-xl border border-border bg-card p-3"
+                >
+                  <p className="text-[13px] font-bold text-foreground">{qz.name}</p>
+                  <p className="mt-1.5 flex items-center gap-2 text-[11px] font-bold text-foreground">
+                    <ClipboardList className="size-3.5" /> {qz.totalQuestions} Questions |{" "}
+                    {qz.totalMarks} Marks | {qz.maxDuration} Mins
+                  </p>
+                </Link>
+              ))}
+            </>
+          )}
         </div>
-
-        {q.isPending && <div className="h-16 animate-pulse rounded-xl bg-card" />}
-
-        {d && d.notes.length > 0 && (
-          <>
-            <p className="px-1 text-[11px] font-extrabold text-foreground">Notes</p>
-            {d.notes.map((n) => (
-              <Link
-                key={n.id}
-                to="/pdf/$batchId/$subjectId/$scheduleId"
-                params={{ batchId, subjectId, scheduleId }}
-                search={{ hw: n.homeworkId }}
-                className="flex items-center gap-3 rounded-xl border border-border bg-card p-2.5 shadow-sm"
-              >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary">
-                  <FileText className="size-4 text-primary" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[12px] font-extrabold text-foreground">
-                    {n.title}
-                  </span>
-                  <span className="block truncate text-[10px] font-bold text-muted-foreground">
-                    {n.name}
-                  </span>
-                </span>
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </Link>
-            ))}
-          </>
-        )}
-
-        {d && d.quizzes.length > 0 && (
-          <>
-            <p className="px-1 text-[11px] font-extrabold text-foreground">DPP Quiz</p>
-            {d.quizzes.map((qz) => (
-              <Link
-                key={qz.id}
-                to="/quiz/$testId"
-                params={{ testId: qz.id }}
-                className="block rounded-xl border border-border bg-card p-3 shadow-sm"
-              >
-                <p className="text-[12px] font-extrabold text-foreground">{qz.name}</p>
-                <p className="mt-1.5 flex items-center gap-2 text-[10px] font-bold text-muted-foreground">
-                  <ClipboardList className="size-3.5" /> {qz.totalQuestions} Questions |{" "}
-                  {qz.totalMarks} Marks | {qz.maxDuration} Mins
-                </p>
-              </Link>
-            ))}
-          </>
-        )}
-      </div>
+      )}
     </div>
   );
 }
