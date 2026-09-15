@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "1f5b7683-ea56-4b1e-9f81-1ad78626bc79",
-  "project_id": "5bfdeb1b-aa6b-454d-933e-8ed92c5655a3",
-  "url": "/__l5e/assets-v1/1f5b7683-ea56-4b1e-9f81-1ad78626bc79/my-doubts.png",
-  "r2_key": "a/v1/5bfdeb1b-aa6b-454d-933e-8ed92c5655a3/1f5b7683-ea56-4b1e-9f81-1ad78626bc79/my-doubts.png",
-  "original_filename": "my-doubts.png",
-  "size": 2782,
   "content_type": "image/png",
-  "created_at": "2026-08-26T13:05:54Z"
+  "created_at": "2026-08-26T13:05:54Z",
+  "original_filename": "my-doubts.png",
+  "project_id": "6e31a190-eba3-42f7-98d2-2e66da60e30c",
+  "r2_key": "a/v1/6e31a190-eba3-42f7-98d2-2e66da60e30c/1f5b7683-ea56-4b1e-9f81-1ad78626bc79/my-doubts.png",
+  "size": 2782,
+  "url": "/__l5e/assets-v1/1f5b7683-ea56-4b1e-9f81-1ad78626bc79/my-doubts.png",
+  "version": 1
 }
